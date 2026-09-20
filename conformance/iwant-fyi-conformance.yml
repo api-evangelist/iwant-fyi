@@ -1,0 +1,139 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  https://iwant.fyi/api/v1/conformance (live self-report, 200) + https://iwant.fyi/protocol/v1 +
+  live probes of https://iwant.fyi/api/mcp, https://iwant.fyi/api/a2a, https://iwant.fyi/api/v1/health
+  and the /.well-known/ surface on 2026-09-19.
+standards:
+- id: iwantfyi-demand-side-protocol
+  conforms: true
+  version: '1.1'
+  evidence: >-
+    The provider is the reference implementation of its own open (Apache-2.0) protocol and publishes a
+    live self-report at GET /api/v1/conformance: "v1.1 compliant with HTTP fallback", 4/4 required
+    tools present, 4/4 recommended tools present, 7/7 checklist points pass (8.1 tools, 6 match shape,
+    7 outcome events, 9 HTTP fallback, 11.2 error taxonomy, 16 signed webhooks, 8.4 idempotency).
+    The initialize response advertises demandProtocol {version 1.1, conformance v1.1}. Self-asserted
+    by the provider but machine-checkable with @iwantfyi/conformance-kit against a key.
+  domain_standard: true
+  domain_standard_note: >-
+    This is the provider's OWN standard (a demand-side purchase-intent protocol), not an industry body's.
+    It is recorded because the contract declares it in-band (info.x-implements in the OpenAPI, the
+    demandProtocol block in MCP initialize, implements/protocols in the agent card) and publishes
+    schemas + a conformance kit — but a single-implementer standard should not be read as
+    cross-vendor interoperability.
+- id: mcp
+  conforms: true
+  version: '2025-06-18'
+  evidence: >-
+    Hosted streamable-http MCP server at https://iwant.fyi/api/mcp; initialize negotiated
+    protocolVersion 2025-06-18 and tools/list returned 10 tools with inputSchema anonymously.
+    Listed in the Official MCP Registry (fyi.iwant/iwant 1.2.0) and Smithery.
+- id: a2a
+  conforms: true
+  version: '0.3.0'
+  evidence: >-
+    A2A Agent Card at /.well-known/agent-card.json (protocolVersion 0.3.0, JSONRPC, 7 skills), graded
+    conformant against the 1.0.0 hard checks in a2a/iwant-fyi-a2a.yml; message/send at
+    https://iwant.fyi/api/a2a answered a live probe with a real Message.
+- id: json-rpc-2.0
+  conforms: true
+  evidence: MCP and A2A transports are JSON-RPC 2.0; the HTTP fallback returns the same JSON-RPC error envelope (observed on a 401 from POST /api/v1/wants).
+- id: openapi-3.0
+  conforms: true
+  evidence: >-
+    OpenAPI 3.0.3 served at https://iwant.fyi/api/openapi.json (200, 12,418 bytes, 5 paths / 8
+    operations / 3 schemas) — captured to openapi/_original/iwant-fyi-openapi.json. Covers only the
+    legacy /api marketplace surface; the canonical /api/v1 protocol endpoints are NOT in it.
+- id: json-schema-2020-12
+  conforms: true
+  evidence: >-
+    Four JSON Schema 2020-12 documents (Want, Match, MatchResponse, OutcomeEvent) served at
+    /.well-known/iwantfyi/schemas/1.1/*.json with $id set (200 each; byte-identical to the GitHub
+    copies) — saved to json-schema/.
+- id: schema-org-jsonld
+  conforms: true
+  evidence: >-
+    Seller catalogs are ingested from "any site with product JSON-LD" or a schema.org JSON-LD feed
+    (skill.md step 0b), and the /cars/{metro}/{make-model} statistics pages carry FAQPage structured
+    data (llms.txt). Declared in docs, not observed by this probe.
+  domain_standard: true
+- id: agentic-commerce-protocol
+  conforms: false
+  evidence: >-
+    ACP is named as an accepted seller feed format (ACP JSONL) and as a supply source, but
+    /api/v1/health lists "acp" under pending_supply_sources, /.well-known/acp.json 404s, and the
+    provider's own positioning is that it sits demand-side ABOVE ACP/UCP. Recorded as not (yet)
+    conformant.
+  domain_standard: true
+- id: x402
+  conforms: false
+  status: dry_run
+  evidence: >-
+    Seller want-unlocks are priced in USDC on Base over x402 ($0.05 / $0.25 / $1 / $5 by want value)
+    and the health endpoint reports modes.x402: "dry_run" — "Payments are not charged during the
+    preview; the push tells you the mode." A declared, priced, not-yet-enforced 402 rail. Stripe's
+    Machine Payments Protocol (MPP) is the second declared rail with modes.mpp: "off".
+- id: hmac-signed-webhooks
+  conforms: true
+  evidence: >-
+    Spec section 16.3 REQUIRES every Standing Want delivery to carry X-IWantFyi-Signature
+    t=<unix>,v1=<hex HMAC-SHA256> over "<t>.<body>" with a one-time whsec_ secret, 300s replay window,
+    event_id dedupe and POST /v1/watches/{id}/rotate-secret; llms.txt adds X-Fyi-* header twins.
+    Self-report checklist "16 signed webhook delivery: pass". See asyncapi/iwant-fyi-webhooks.yml.
+- id: idempotency-keys
+  conforms: true
+  evidence: >-
+    Spec 8.4: client_token (<=128 chars, or an Idempotency-Key header over HTTP) on demand.create_want
+    and demand.create_watch, first-call result replayed for >= 24h; demand.record_outcome idempotent
+    by definition (7.3). Self-report "8.4 idempotency keys: pass". Scoped to the protocol write tools,
+    not the legacy REST writes — see conventions/.
+- id: retryable-error-taxonomy
+  conforms: true
+  evidence: >-
+    Spec 11.2 REQUIRES error.data.{error_type, retryable, retry_after_ms}; observed live on the
+    401 from POST /api/v1/wants ({"error_type":"unauthorized","retryable":false}). Legacy /api
+    endpoints still return the flat {"error": "..."} shape.
+- id: pagination
+  conforms: true
+  evidence: >-
+    Legacy REST: page-number pagination (page / total / totalPages, OpenAPI listWants). Protocol v1.1
+    (6.3): deterministic total order + next_cursor on MatchResponse and cursor on demand.search.
+- id: oauth2
+  conforms: false
+  evidence: No OAuth anywhere — bearer API keys only; /.well-known/oauth-authorization-server and oauth-protected-resource 404.
+- id: oidc
+  conforms: false
+  evidence: /.well-known/openid-configuration 404. Human sign-in is Google OAuth as a CLIENT, not an issuer.
+- id: rfc9728-protected-resource-metadata
+  conforms: false
+  evidence: 404 on the MCP host (which is the apex).
+- id: rfc7591-dynamic-client-registration
+  conforms: false
+  evidence: >-
+    No registration_endpoint metadata. POST /api/agents/register is a self-serve key issuance flow
+    with the same effect for agents, but it is a proprietary REST call, not RFC 7591.
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: Errors are JSON-RPC-shaped application/json, never application/problem+json.
+- id: rfc8594-sunset-header
+  conforms: false
+  evidence: 'Spec 12.4 says a Deprecation header or _deprecated: true marker SHOULD accompany deprecated fields; nothing is deprecated today and no Sunset header is specified.'
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: /.well-known/security.txt and /security.txt 404 on both hosts.
+- id: rfc9727-api-catalog
+  conforms: false
+  evidence: /.well-known/api-catalog 404.
+- id: apis-json
+  conforms: false
+  evidence: /apis.json, /apis.yml and /.well-known/apis.json 404.
+- id: llms-txt
+  conforms: true
+  evidence: https://iwant.fyi/llms.txt served (200, text/plain, 12,290 bytes) and saved verbatim to llms/iwant-fyi-llms.txt; /llms-full.txt also 200 (not committed).
+- id: asyncapi
+  conforms: false
+  evidence: /asyncapi.yaml and /api/asyncapi.json 404; the webhook contract is prose + JSON in spec section 16 only.
+- id: soc2
+  conforms: false
+  evidence: No trust center, certification or compliance program published (probe-security-programs.py found none; /security 404). Privacy policy names HTTPS, row-level security, hashed API keys and Stripe PCI for any future fees.

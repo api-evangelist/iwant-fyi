@@ -1,0 +1,113 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  registry.npmjs.org and pypi.org metadata endpoints (unauthenticated, 2026-09-19) for every package
+  named in https://iwant.fyi/llms.txt, https://iwant.fyi/.well-known/mcp.json, https://iwant.fyi/developers
+  and https://github.com/staugs/iwantfyi-spec; plus the GitHub repository search for iwant.fyi / iwantfyi.
+summary:
+  first_party_sdk_count: 6
+  first_party_tool_count: 1
+  third_party_package_count: 0
+  note: >-
+    Six official framework adapters (all Apache-2.0, all pointing home to https://iwant.fyi/protocol/v1,
+    PyPI author "iwant.fyi" <hi@iwant.fyi>) plus a conformance-test CLI. Currency is mixed: the
+    TypeScript SDK was re-released 2026-09-10; the other five have not moved since their 2026-06-09
+    release, while the live server has gone from protocol 1.0 to 1.1 and added the vehicle,
+    price-check, introduction, watch and supply tools since. The docs still say "Four official SDKs"
+    in one place and "six" in another; the registries hold six.
+github_organization:
+  found: true
+  url: https://github.com/staugs
+  kind: personal account, not an organization
+  note: >-
+    Every official iwant.fyi repository (spec, SDK, four framework adapters, examples, mcp pointer)
+    lives under the personal GitHub account "staugs". The developers page links
+    https://github.com/staugs/iwantfyi-spec as "GitHub repo". There is no github.com/iwantfyi or
+    github.com/iwant-fyi organization (both 404).
+packages:
+- language: typescript
+  registry: npm
+  name: '@iwantfyi/sdk'
+  url: https://www.npmjs.com/package/@iwantfyi/sdk
+  install: npm install @iwantfyi/sdk
+  official: true
+  version: 0.2.0
+  published: '2026-09-10'
+  repository: https://github.com/staugs/iwantfyi-sdk
+  license: Apache-2.0
+  note: TypeScript / Node client for MCP + HTTP; 2 versions published.
+- language: typescript
+  registry: npm
+  name: '@iwantfyi/ai-sdk'
+  url: https://www.npmjs.com/package/@iwantfyi/ai-sdk
+  install: npm install @iwantfyi/ai-sdk
+  official: true
+  version: 0.1.0
+  published: '2026-06-09'
+  repository: https://github.com/staugs/iwantfyi-ai-sdk
+  license: Apache-2.0
+  note: Vercel AI SDK tools. The repository URL in the npm metadata returns no public repo under staugs (not in the account's repo list).
+- language: python
+  registry: pypi
+  name: iwantfyi-langchain
+  url: https://pypi.org/project/iwantfyi-langchain/
+  install: pip install iwantfyi-langchain
+  official: true
+  version: 0.1.1
+  published: '2026-06-09'
+  repository: https://github.com/staugs/iwantfyi-langchain
+  license: Apache-2.0
+- language: python
+  registry: pypi
+  name: iwantfyi-composio
+  url: https://pypi.org/project/iwantfyi-composio/
+  install: pip install iwantfyi-composio
+  official: true
+  version: 0.1.1
+  published: '2026-06-09'
+  repository: https://github.com/staugs/iwantfyi-composio
+  license: Apache-2.0
+- language: python
+  registry: pypi
+  name: iwantfyi-crewai
+  url: https://pypi.org/project/iwantfyi-crewai/
+  install: pip install iwantfyi-crewai
+  official: true
+  version: 0.1.1
+  published: '2026-06-09'
+  repository: https://github.com/staugs/iwantfyi-crewai
+  license: Apache-2.0
+- language: python
+  registry: pypi
+  name: iwantfyi-llamaindex
+  url: https://pypi.org/project/iwantfyi-llamaindex/
+  install: pip install iwantfyi-llamaindex
+  official: true
+  version: 0.1.1
+  published: '2026-06-09'
+  repository: https://github.com/staugs/iwantfyi-llamaindex
+  license: Apache-2.0
+  note: Named in mcp.json and the homepage; not in the account's public repo list (the PyPI Repository URL may 404).
+tools:
+- language: typescript
+  registry: npm
+  name: '@iwantfyi/conformance-kit'
+  url: https://www.npmjs.com/package/@iwantfyi/conformance-kit
+  install: npx @iwantfyi/conformance-kit --mcp https://iwant.fyi/api/mcp --http https://iwant.fyi/api/v1 --api-key <key>
+  official: true
+  version: 1.1.0
+  published: '2026-06-08'
+  repository: https://github.com/staugs/iwantfyi-spec
+  binary: iwantfyi-conformance
+  license: Apache-2.0
+  note: Conformance test CLI for any implementation of the protocol (spec section 15); detail in cli/iwant-fyi-cli.yml.
+absent:
+- {registry: npm, name: '@iwantfyi/llamaindex', status: 404}
+- {registry: npm, name: '@iwantfyi/mcp', status: 404}
+- {registry: npm, name: iwantfyi, status: 404}
+- {registry: pypi, name: iwantfyi, status: 404}
+- {registry: pypi, name: iwantfyi-sdk, status: 404}
+- {registry: pypi, name: iwantfyi-mcp, status: 404}
+example_repos:
+- url: https://github.com/staugs/iwantfyi-examples
+  note: Three example agents (tools-finder, auto-parts-diagnostic, seller-agent), Apache-2.0, last pushed 2026-05-21.

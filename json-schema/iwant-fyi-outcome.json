@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://iwant.fyi/.well-known/iwantfyi/schemas/1.1/outcome.json",
+  "title": "OutcomeEvent",
+  "description": "An outcome event reported back to close the demand-signal loop (iwant.fyi demand-side protocol v1.1 §7).",
+  "type": "object",
+  "required": ["want_id", "match_id", "event"],
+  "properties": {
+    "want_id": { "type": "string" },
+    "match_id": { "type": "string" },
+    "event": {
+      "type": "string",
+      "enum": ["viewed", "clicked", "started_checkout", "purchased", "abandoned", "not_purchased"]
+    },
+    "agent_id": { "type": "string", "description": "Required if the Want had origin.agent_id." },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "value_cents": { "type": "integer", "description": "Required for purchased." },
+    "metadata": { "type": "object" }
+  }
+}

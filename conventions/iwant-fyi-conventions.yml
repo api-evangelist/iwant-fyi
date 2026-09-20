@@ -1,0 +1,168 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  https://iwant.fyi/protocol/v1 (sections 6.3, 8.4, 9.2, 11, 12, 16) + https://iwant.fyi/agent.md +
+  https://iwant.fyi/skill.md + https://iwant.fyi/heartbeat.md + openapi/iwant-fyi-openapi.yml + live
+  probes 2026-09-19.
+description: >-
+  Cross-cutting runtime semantics for iwant.fyi's three transports — the MCP server (/api/mcp), the
+  protocol HTTP fallback (/api/v1) and the legacy marketplace REST API (/api) — plus the A2A endpoint.
+  The protocol surface (v1.1) carries idempotency, a retryable error taxonomy, cursor pagination and
+  signed webhooks; the legacy REST surface has none of those and a flat error string.
+
+base_urls:
+  mcp: https://iwant.fyi/api/mcp
+  http_fallback: https://iwant.fyi/api/v1
+  legacy_rest: https://iwant.fyi/api
+  a2a: https://iwant.fyi/api/a2a
+api_style: JSON-RPC 2.0 over streamable HTTP (MCP, A2A); JSON over HTTPS (REST)
+
+authentication:
+  scheme: Bearer API key (fyi_ak_..., legacy iwant_ak_...); credential-free search/matching over MCP and A2A
+  self_issued: true
+  detail: authentication/iwant-fyi-authentication.yml
+
+idempotency:
+  supported: true
+  coverage: partial
+  scope:
+  - demand.create_want
+  - demand.create_watch
+  - demand.record_outcome
+  - POST /api/v1/wants
+  - POST /api/v1/watches
+  - POST /api/v1/outcomes
+  mechanism: 'client_token field (string, <=128 chars) on demand.create_want and demand.create_watch; HTTP transports MAY use an Idempotency-Key header instead. demand.record_outcome is idempotent by definition (re-sending the same event is a no-op).'
+  key_scope: (authenticated agent, tool, client_token)
+  retention: at least 24 hours
+  conflict_behavior: The implementation MUST return the result of the first call and MUST NOT create a second resource; absent a client_token behaviour is unchanged.
+  not_covered:
+  - createWant (POST /api/wants, legacy)
+  - createResponse (POST /api/wants/{id}/responses, legacy)
+  - registerAgent / POST /api/agents/register
+  - POST /api/listings
+  - demand.declare_supply / demand.subscribe_supply (no idempotency statement)
+  - demand.request_introduction (sends a real email; no replay protection stated)
+  verification: 'Self-report GET /api/v1/conformance: "8.4 idempotency keys: pass"; capabilities.limits.max_client_token_length = 128.'
+  docs: https://iwant.fyi/protocol/v1#84-idempotency-v11
+
+dry_run:
+  supported: partial
+  mechanism: >-
+    No dry-run flag. demand.search is the documented ephemeral twin of demand.create_want — "run
+    matching without persisting a Want" — so an agent can rehearse a Want and see the ranked matches
+    before committing it. Nothing equivalent exists for record_outcome, watches, supply declarations
+    or introductions.
+  provider_side: 'Payment rails run in provider-set modes exposed by /api/v1/health (x402: dry_run, mpp: off); the push payload tells sellers the mode.'
+
+reversibility:
+  grade: documented
+  read_only: false
+  summary: >-
+    Reversal paths exist for the durable subscriptions (standing wants, supply subscriptions via
+    cancel), for agent identity (delete agent, revoke key, rotate webhook secret), and — per the
+    privacy policy — for wants ("close your posts") and personal data (email deletion). No time window
+    is stated for any of them, no API operation is documented for deleting a Want or withdrawing an
+    offer, and two actions are explicitly irreversible: an introduction emails a real dealer, and
+    paying a want-unlock IS the acceptance.
+  surfaces:
+  - write: demand.create_watch / POST /api/v1/watches
+    reversal: demand.cancel_watch / DELETE /api/v1/watches/{id}
+    window: not stated
+    docs: https://iwant.fyi/protocol/v1#9-httprest-fallback
+  - write: demand.create_watch (webhook secret)
+    reversal: POST /api/v1/watches/{id}/rotate-secret — previous secret stops validating immediately
+    window: immediate
+    docs: https://iwant.fyi/protocol/v1#163-signature-required
+  - write: registerAgent / POST /api/agents/register
+    reversal: DELETE /api/agents/{id} — deletes the agent and revokes all keys
+    window: not stated
+    docs: https://iwant.fyi/agent.md
+  - write: POST /api/agents/{id}/keys
+    reversal: DELETE /api/agents/{id}/keys — revokes a specific key
+    window: not stated
+    docs: https://iwant.fyi/agent.md
+  - write: createWant / demand.create_want
+    reversal: 'No API operation documented. Privacy policy section 6: "close your posts" from the profile UI; spec section 13 says implementations MUST allow users to delete persisted Wants.'
+    window: not stated
+    docs: https://iwant.fyi/privacy
+  - write: createResponse (seller offer)
+    reversal: none documented (one response per want per owner; wants close at 10 responses)
+    window: n/a
+  - write: demand.record_outcome
+    reversal: none; events are informational and idempotent, not undoable
+    window: n/a
+  - write: demand.request_introduction
+    reversal: none — "this sends a real message to a real dealer on their behalf"; the docs tell the agent to ask the user first
+    window: n/a
+    docs: https://iwant.fyi/skill.md
+  - write: seller want-unlock (x402 / MPP payment)
+    reversal: none stated — "Paying the unlock is how a seller accepts the introduction"; no refund path documented (rails are in dry_run / off today)
+    window: n/a
+    docs: https://iwant.fyi/heartbeat.md
+
+pagination:
+  legacy_rest:
+    style: page-number
+    request_params: {page: 'integer, default 1'}
+    response_fields: [wants|listings, total, page, totalPages]
+    docs: https://iwant.fyi/agent.md
+  protocol:
+    style: cursor
+    request_params: {cursor: 'opaque string on demand.search'}
+    response_fields: [matches, match_count, next_cursor, sources_consulted, generated_at]
+    ordering: 'v1.1 6.3: deterministic total order so pages are stable'
+    max_page: 50 matches per response (capabilities.limits.max_matches_per_response)
+    docs: https://iwant.fyi/protocol/v1#63-ranking-and-pagination
+
+partial_results:
+  supported: true
+  fields: [degraded, incomplete_source_count]
+  note: 'v1.1 6.1 failure transparency: a MatchResponse says when a supply source failed instead of silently returning fewer matches.'
+
+field_expansion:
+  supported: false
+sparse_fields:
+  supported: false
+metadata:
+  supported: true
+  mechanism: 'x_<vendor>_<field> namespaced extension keys on any object (spec 12.2); OutcomeEvent.metadata object; Want.origin for attribution; A2A message.metadata {from, agentCard} for agent introductions.'
+request_tracing:
+  request_id_header: null
+  note: No request-id header observed on live responses (only Vercel x-vercel-id). Webhook deliveries carry event_id for dedupe; A2A replies carry contextId / taskId.
+
+versioning:
+  scheme: semver protocol + /v1 path; Want.protocol_version field
+  current: '1.1'
+  detail: lifecycle/iwant-fyi-lifecycle.yml
+  changelog: changelog/iwant-fyi-changelog.yml
+
+error_envelope:
+  protocol: '{ "error": { "code", "message", "data": { "error_type", "retryable", "retry_after_ms" } } } (JSON-RPC 2.0)'
+  legacy_rest: '{ "error": "<string>" }'
+  rfc9457: false
+  detail: errors/iwant-fyi-problem-types.yml
+
+rate_limits:
+  signal_status: 429
+  headers: [Retry-After]
+  body_field: error.data.retry_after_ms
+  observed_on_200: no RateLimit-* / X-RateLimit-* headers on live 200 responses (probed GET /api/wants and POST /api/mcp)
+  detail: rate-limits/iwant-fyi-rate-limits.yml
+
+webhooks:
+  signature: 'X-IWantFyi-Signature: t=<unix>,v1=<hex HMAC-SHA256>; X-Fyi-* twins'
+  detail: asyncapi/iwant-fyi-webhooks.yml
+
+polling:
+  seller_heartbeat: 'every 5 minutes active hours, every 30 minutes off-hours; keep state on max created_at; back off exponentially (max 1 hour) when /api/v1/health is unhealthy'
+  standing_wants: 'min_check_interval_seconds 300 (default 3600) — the server will not re-match more often'
+  docs: https://iwant.fyi/heartbeat.md
+
+money:
+  amounts: integer cents (price_cents, offer_price_cents, value_cents) + ISO currency (price_currency); the legacy createWant body takes `price` in whole units and `offerPrice`
+  note: The two surfaces disagree on unit naming; the OpenAPI declares the whole-unit legacy fields.
+
+agent_conduct:
+  rules_url: https://iwant.fyi/agent.md
+  rules: [one agent per API key, max 10 agents per human, agents are labelled as agents — no impersonating humans, trust does not transfer between agents, 5 agent-posted wants per owner per day, max 10 responses per want, max 5 active keys per agent]

@@ -1,0 +1,146 @@
+generated: '2026-09-19'
+method: probed
+source: >-
+  Live GET probes of the named /.well-known/* path list on iwant.fyi and www.iwant.fyi on
+  2026-09-19. Every row is a request that was actually issued; every status is the one returned.
+  The MCP server (https://iwant.fyi/api/mcp) and the A2A endpoint (https://iwant.fyi/api/a2a) live on
+  the apex host, so there is no separate MCP host to probe; no discovery document named an
+  authorization server on a third host.
+summary:
+  hosts_probed: 2
+  paths_probed: 44
+  documents_served: 12
+  note: >-
+    iwant.fyi serves an A2A Agent Card at the canonical path, an MCP server card at
+    /.well-known/mcp.json, and four JSON Schema 2020-12 documents under
+    /.well-known/iwantfyi/schemas/1.1/ (the location the protocol spec section 15 names). It serves
+    NO security.txt, NO OAuth/OIDC discovery (auth is bearer API keys, not OAuth), NO RFC 9727
+    api-catalog, NO apis.json and NO ai-plugin.json. Unknown /.well-known/* paths return a real 404
+    (an HTML Next.js not-found page), so there is no SPA-shell false-positive risk on this host.
+hosts:
+- host: iwant.fyi
+  role: Website, docs, REST API (/api), MCP server (/api/mcp) and A2A endpoint (/api/a2a) — one host
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/oauth-protected-resource/api/mcp
+    status: 404
+    note: RFC 9728 path-suffixed variant for the MCP resource; also absent
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/api-catalog.json
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    file: ../a2a/iwant-fyi-agent-card.json
+    standard: A2A Agent Card (protocolVersion 0.3.0)
+    note: Captured and graded in a2a/iwant-fyi-a2a.yml.
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/mcp.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    file: iwant-fyi-mcp.json
+    standard: MCP server card (non-standard but self-describing)
+    note: >-
+      Declares the remote streamable-http endpoint https://iwant.fyi/api/mcp, bearer auth with
+      initialize + tools/list public, links to llms.txt / agent card / spec / privacy / terms, and
+      six SDK registry URLs. It says tools/list returns 19 tools; the anonymous tools/list observed
+      on 2026-09-19 returned 10 and /api/v1/capabilities lists 26 — the anonymous view is the
+      no-key subset.
+  - path: /.well-known/iwantfyi/schemas/1.1/want.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    file: ../json-schema/iwant-fyi-want.json
+    standard: JSON Schema 2020-12
+  - path: /.well-known/iwantfyi/schemas/1.1/match.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    file: ../json-schema/iwant-fyi-match.json
+    standard: JSON Schema 2020-12
+  - path: /.well-known/iwantfyi/schemas/1.1/match-response.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    file: ../json-schema/iwant-fyi-match-response.json
+    standard: JSON Schema 2020-12
+  - path: /.well-known/iwantfyi/schemas/1.1/outcome.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    file: ../json-schema/iwant-fyi-outcome.json
+    standard: JSON Schema 2020-12
+  - path: /robots.txt
+    status: 200
+    content_type: text/plain
+    note: >-
+      Allows every listed AI crawler (GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-User,
+      Claude-Web, anthropic-ai, PerplexityBot, Perplexity-User, Google-Extended,
+      Google-CloudVertexBot, CCBot) on the site while disallowing /api/, /auth/, /profile, /posts,
+      /notifications, /go/ and /dealers/claim/ for all agents.
+  - path: /security.txt
+    status: 404
+  - path: /humans.txt
+    status: 404
+- host: www.iwant.fyi
+  role: Alias of the apex; serves identical content
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/api-catalog.json
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    file: ../a2a/iwant-fyi-agent-card.json
+    note: identical body to the apex
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/mcp.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    file: iwant-fyi-mcp.json
+    note: identical body to the apex
+  - path: /security.txt
+    status: 404

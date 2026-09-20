@@ -1,0 +1,78 @@
+generated: '2026-09-19'
+method: searched
+source: https://iwant.fyi/protocol/v1#16-notifications-and-webhooks--standing-wants-v11 + https://iwant.fyi/heartbeat.md + https://iwant.fyi/llms.txt + https://iwant.fyi/api/v1/capabilities
+checked: '2026-09-19'
+spec_type: webhook-catalog
+summary: >-
+  iwant.fyi documents a real, customer-registerable, HMAC-signed webhook surface but publishes NO
+  AsyncAPI document (/asyncapi.yaml and /api/asyncapi.json 404). Two push channels exist: buyer-side
+  Standing Wants (spec section 16, v1.1) deliver want.matches to an https URL the agent supplies, and
+  seller-side supply subscriptions push matching buyer wants to a signed webhook or the seller's A2A
+  endpoint. The live capabilities document lists "webhooks" among supported features and the
+  conformance self-report passes "16 signed webhook delivery".
+asyncapi:
+  present: false
+  probed:
+  - {url: https://iwant.fyi/asyncapi.yaml, status: 404}
+  - {url: https://iwant.fyi/api/asyncapi.json, status: 404}
+webhooks:
+  customer_registerable: true
+  registration:
+  - tool: demand.create_watch
+    http: POST /api/v1/watches
+    body: 'notify: { transport: webhook, url: <https only>, min_score: 0..1 (default 0.5), check_interval_seconds: >= 300 (default 3600) }'
+    returns: 'the Standing Want + webhook_secret (whsec_...) exactly once'
+  - tool: demand.subscribe_supply
+    http: POST /api/v1/supply/subscriptions
+    body: seller webhook URL or A2A endpoint
+    returns: matching buyer wants pushed as they arrive
+  management:
+  - {tool: demand.list_watches, http: 'GET /api/v1/watches'}
+  - {tool: demand.cancel_watch, http: 'DELETE /api/v1/watches/{id}'}
+  - {http: 'POST /api/v1/watches/{id}/rotate-secret', note: 'new whsec_ returned once; previous secret stops validating immediately'}
+  openapi_webhooks_block: false
+  openapi_callbacks: false
+events:
+- name: want.matches
+  direction: platform -> buyer agent
+  trigger: new matches at or above min_score for a Standing Want, at most once per (standing_want, source, source_id) unless a material change (price drop, back in stock) — re-notified with a distinct event_id
+  payload:
+    type: want.matches
+    event_id: UUID v4, unique per logical delivery; retries reuse it
+    standing_want_id: string
+    want_id: string
+    query: string
+    new_match_count: integer
+    matches: array of Match (json-schema/iwant-fyi-match.json)
+    generated_at: ISO 8601
+- name: want pushed to seller
+  direction: platform -> seller agent (webhook or A2A)
+  trigger: a buyer want matches the seller's declared supply
+  payload:
+    want: buyer want detail (full detail free for indexed catalogs; otherwise gated behind unlock)
+    unlock_url: string
+    unlock: '{ price_cents, currency, network, mode }'
+  commercial: 'Unlock priced $0.05 (< $50 want) / $0.25 (< $250) / $1 (< $1,000) / $5 (above) in USDC on Base over x402, or cards / Tempo stablecoins over Stripe MPP; not charged during the preview (health: x402 dry_run, mpp off). Paying the unlock is the seller''s acceptance.'
+security:
+  scheme: HMAC-SHA256 (Stripe model)
+  headers:
+  - 'X-IWantFyi-Signature: t=<unix_seconds>,v1=<hex_hmac_sha256>'
+  - 'X-IWantFyi-Event: want.matches'
+  - 'User-Agent: iwant.fyi-webhook/1.1'
+  - 'X-Fyi-* twins of the above (since 2026-09-12; the X-IWantFyi-* headers are still sent alongside)'
+  signed_payload: '"<t>" + "." + <raw_request_body>'
+  secret: whsec_... generated at Standing Want creation, returned once, rotatable
+  replay_protection: receivers SHOULD reject |now - t| > 300s; t is inside the signed payload
+  verification: constant-time compare of the recomputed v1
+  transport: notify.url MUST be https; http is rejected
+delivery:
+  guarantee: at-least-once; receivers MUST dedupe on event_id
+  success: 2xx within the implementation's timeout (RECOMMENDED 5s)
+  retries: exponential backoff (RECOMMENDED +30s, +5m, +30m, +2h, +6h) reusing event_id; the Standing Want MAY be auto-paused after retries are exhausted
+  limits:
+    min_check_interval_seconds: 300
+    max_active_watches_per_agent: 100
+    max_matches_per_response: 50
+polling_alternative:
+  docs: https://iwant.fyi/heartbeat.md
+  note: Sellers may poll GET /api/wants?wedge=...&sort=newest every 5 minutes (active hours) / 30 minutes (off-hours) instead of subscribing; state on max created_at.

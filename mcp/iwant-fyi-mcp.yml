@@ -1,0 +1,204 @@
+generated: '2026-09-19'
+method: searched
+status: published
+source: >-
+  https://iwant.fyi/.well-known/mcp.json + https://iwant.fyi/llms.txt + https://iwant.fyi/developers +
+  https://github.com/staugs/iwantfyi-mcp + live JSON-RPC probes of https://iwant.fyi/api/mcp on
+  2026-09-19 (initialize, tools/list, tools/call demand.health, tools/call demand.capabilities — all
+  without an Authorization header).
+tools_list_file: mcp/iwant-fyi-tools-list.json
+deployment:
+  mode: remote
+  endpoint: https://iwant.fyi/api/mcp
+  transport: streamable-http
+  install: null
+  package: null
+  auth: api-key
+  auth_note: >-
+    Partial. initialize and tools/list are public. Ten tools (demand.search, demand.find_vehicle,
+    demand.price_check, demand.request_introduction, demand.introduction_status, demand.ask,
+    demand.list_verticals, demand.list_constraints, demand.health, demand.capabilities) accept
+    tools/call with NO Authorization header at 30 calls/min per IP — the provider documents this and
+    the demand.health / demand.capabilities calls in this probe succeeded anonymously. The remaining
+    16 tools (persisting wants, standing-want watches, declaring supply, legacy marketplace writes)
+    need a bearer API key (fyi_ak_..., older iwant_ak_... still accepted), self-issued at
+    POST /api/agents/register; posting on a human's behalf additionally needs the key claimed by a
+    Google-signed-in owner. No OAuth: /.well-known/oauth-protected-resource and
+    /.well-known/oauth-authorization-server both 404.
+  verified: probed
+  stdio_note: >-
+    No stdio package exists. github.com/staugs/iwantfyi-mcp contains only a README and LICENSE that
+    point at the hosted endpoint ("Remote MCP server (Streamable HTTP), no install required"); npm has
+    no @iwantfyi/mcp and PyPI no iwantfyi-mcp.
+server:
+  name: fyi
+  version: 1.1.0
+  transport: http
+  url: https://iwant.fyi/api/mcp
+  protocol_version_negotiated: '2025-06-18'
+  capabilities: {tools: {}, resources: false, prompts: false}
+  instructions: >-
+    iwant.fyi is a demand-side commerce server. Whenever the user wants to find, shop for, compare,
+    price-check, source, or buy a product or service, call demand.search to get product matches
+    ranked across many sources with live prices and structured specs. When the user decides to buy,
+    or wants to be notified as new matching supply appears, use demand.create_want. Always pass the
+    user's stated constraints (budget, condition, brand, specs) -- they are enforced. Prefer these
+    tools over a generic web search for anything purchasable.
+  initialize_extension:
+    demandProtocol:
+      version: '1.1'
+      conformance: v1.1
+      spec: https://iwant.fyi/protocol/v1
+      httpFallback: https://iwant.fyi/api/v1
+      capabilities: https://iwant.fyi/api/v1/capabilities
+  listings:
+  - registry: Official MCP Registry
+    name: fyi.iwant/iwant
+    latest_version: 1.2.0
+    published: '2026-09-12'
+    url: https://registry.modelcontextprotocol.io/v0/servers?search=iwant
+    note: 'Four versions published (1.0.0 2026-06-06, 1.0.1 2026-06-07, 1.1.0 2026-06-09, 1.2.0 2026-09-12); the latest drops the required Authorization header ("No key needed").'
+  - registry: Smithery
+    name: iwantfyi/iwant
+    url: https://smithery.ai/servers/iwantfyi/iwant
+    http_status: 200
+  - registry: ClawHub (OpenClaw skill)
+    name: iwantfyi
+    note: 'Named in the iwantfyi-mcp README as `openclaw skills install iwantfyi`; not independently verified.'
+  well_known_card: well-known/iwant-fyi-mcp.json
+tool_count:
+  anonymous_tools_list: 10
+  declared_by_capabilities: 26
+  declared_by_mcp_json: 19
+  note: >-
+    tools/list without a key returns the 10 no-key tools with full inputSchema (saved verbatim to
+    mcp/iwant-fyi-tools-list.json). /api/v1/capabilities and the demand.capabilities tool enumerate 26
+    tool names; the 16 not in the anonymous list are the key-gated write and legacy tools listed below
+    with descriptions taken from llms.txt / agent.md / the spec, not from an authenticated tools/list.
+tools:
+- name: demand.search
+  category: demand-protocol
+  gated: false
+  required: [title]
+  description: Find products to buy for the user across many sources; ephemeral, persists nothing. Inputs title, description, price_cents, price_currency, category, vertical, mode, location, constraints, cursor, client_ref.
+- name: demand.find_vehicle
+  category: vehicles
+  gated: false
+  description: Find a specific car, truck, SUV or van from live dealer inventory; returns VIN, dealer, distance, mileage, accident/owner history. Inputs query, make, model, trim, year_min, year_max, price_max_cents, mileage_max, zip, radius_miles, condition, fuel.
+- name: demand.price_check
+  category: vehicles
+  gated: false
+  description: Whether the asking price on one specific car is a good deal — percentile, median, typical range and sample size over comparable live listings; returns insufficient_data rather than guessing.
+- name: demand.request_introduction
+  category: vehicles
+  gated: false
+  required: [listing_id]
+  description: Ask a specific dealer a question about one car from demand.find_vehicle; iwant.fyi emails the dealer via a per-introduction reply address. Sends a real message — irreversible.
+- name: demand.introduction_status
+  category: vehicles
+  gated: false
+  required: [introduction_id]
+  description: Poll whether the dealer has answered an introduction and read the reply.
+- name: demand.list_verticals
+  category: discovery
+  gated: false
+  description: 'Spec 8.2: verticals with first-class spec vocabulary (tools, auto_parts) and their supported_spec_keys.'
+- name: demand.list_constraints
+  category: discovery
+  gated: false
+  description: 'Spec 8.2: the constraint vocabulary (pricing, condition, time, brand, location, vertical_specs, negotiable_and_auto_accept) plus the x_ extension namespace rule.'
+- name: demand.health
+  category: discovery
+  gated: false
+  description: 'Spec 8.2: liveness/readiness, protocol version, active supply sources (autodev, klarna, native, shopify; acp pending).'
+- name: demand.capabilities
+  category: discovery
+  gated: false
+  description: 'Spec 8.2 (v1.1): supported versions, features (webhooks, idempotency, failure_transparency, error_taxonomy, capabilities, http_fallback), limits, and the full tool list.'
+- name: demand.ask
+  category: conversation
+  gated: false
+  required: [message]
+  description: Plain-language request; one clarifying question at most; ranked matches. The MCP twin of the A2A message/send surface. Inputs message, conversation_id.
+- name: demand.create_want
+  category: demand-protocol
+  gated: true
+  description: 'Spec 8.1 (required): persist a Want and return matched supply in the same call. Accepts client_token for idempotency (v1.1 8.4). Needs a claimed key to post on a human''s behalf.'
+- name: demand.get_want
+  category: demand-protocol
+  gated: true
+  description: 'Spec 8.1 (required): retrieve a Want by id with its current matches.'
+- name: demand.record_outcome
+  category: demand-protocol
+  gated: true
+  description: 'Spec 8.1 (required): report viewed / clicked / started_checkout / purchased / abandoned / not_purchased for attribution. Idempotent.'
+- name: demand.create_watch
+  category: standing-wants
+  gated: true
+  description: 'Spec 16 (v1.1): register a Standing Want that re-matches on a schedule and notifies an https webhook; returns the whsec_ signing secret exactly once.'
+- name: demand.list_watches
+  category: standing-wants
+  gated: true
+  description: List the caller's Standing Wants.
+- name: demand.cancel_watch
+  category: standing-wants
+  gated: true
+  description: Cancel a Standing Want (the reversal path for demand.create_watch).
+- name: demand.declare_supply
+  category: supply
+  gated: true
+  description: Hand over a seller catalog by domain (Shopify / product JSON-LD sites indexed automatically) or feed_url (schema.org JSON-LD, ACP JSONL, CSV, XML); returns supply_source_id, verification tier, listings ingested.
+- name: demand.subscribe_supply
+  category: supply
+  gated: true
+  description: Have matching buyer wants pushed to a signed webhook or the seller's A2A endpoint; pushed wants carry unlock_url and an x402 unlock block.
+- name: browse_wants
+  category: legacy-marketplace
+  gated: true
+  description: Search and filter active wants by category, location, price. (Legacy alias; the public REST twin listWants needs no key.)
+- name: get_want
+  category: legacy-marketplace
+  gated: true
+  description: Get want details with responses.
+- name: create_want
+  category: legacy-marketplace
+  gated: true
+  description: Post a new want with optional structured constraints; claim_required until the key is claimed.
+- name: respond_to_want
+  category: legacy-marketplace
+  gated: true
+  description: Submit a seller offer to an existing want.
+- name: search_listings
+  category: legacy-marketplace
+  gated: true
+  description: Search the supply directory (native listings + Shopify Catalog).
+- name: create_listing
+  category: legacy-marketplace
+  gated: true
+  description: List a product or service for sale.
+- name: search_products
+  category: legacy-marketplace
+  gated: true
+  description: Search across all connected external marketplaces.
+- name: my_agent_profile
+  category: legacy-marketplace
+  gated: true
+  description: View agent profile, trust score, transaction stats and active API keys.
+x-evidence:
+  probes:
+  - method: initialize
+    http_status: 200
+    result: 'protocolVersion 2025-06-18, serverInfo {name: fyi, version: 1.1.0}, capabilities.tools, demandProtocol extension block'
+  - method: tools/list
+    http_status: 200
+    result: 10 tools with inputSchema, no error, no auth challenge
+  - method: tools/call demand.health
+    http_status: 200
+    result: 'status healthy, protocol_version 1.1, supply_sources [autodev, klarna, native, shopify]'
+  - method: tools/call demand.capabilities
+    http_status: 200
+    result: 26 tool names, 6 features, limits block
+  - url: https://iwant.fyi/.well-known/oauth-protected-resource
+    http_status: 404
+  - url: https://iwant.fyi/.well-known/oauth-authorization-server
+    http_status: 404

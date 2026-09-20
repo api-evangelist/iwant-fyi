@@ -1,0 +1,160 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "fyi",
+  "description": "Reference implementation of the iwant.fyi demand-side protocol v1.0. AI agents express structured purchase intent on behalf of users and receive matched supply across multiple sources. MCP-native with HTTP fallback. Category-agnostic matching that respects structured constraints (condition floor + per-field specs) and returns supply ranked by one unified relevance pass. Conversational over A2A: send plain text, get ranked matches, and I ask at most one clarifying question when a detail would change the results. Sellers can describe what they offer and receive matching wants.",
+  "url": "https://iwant.fyi/api/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "0.70.0",
+  "implements": {
+    "specification": "iwant.fyi demand-side protocol v1.0",
+    "specUrl": "https://iwant.fyi/protocol/v1",
+    "conformance": "v1.0",
+    "withHttpFallback": true
+  },
+  "provider": {
+    "organization": "iwant.fyi",
+    "url": "https://iwant.fyi",
+    "contactEmail": "hi@iwant.fyi"
+  },
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": true
+  },
+  "authentication": {
+    "schemes": [
+      "bearer"
+    ],
+    "credentials": {
+      "type": "apiKey",
+      "description": "API key obtained by registering an agent at POST /api/agents. Format: iwant_ak_..."
+    }
+  },
+  "defaultInputModes": [
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "converse",
+      "name": "Talk to iwant.fyi",
+      "description": "Send a plain-text message. Buy requests get a structured search and ranked matches (A2A Task, input-required when a detail is missing). Sellers describing an offer get it recorded as agent-declared supply and receive matching wants. Supports message/send and tasks/get.",
+      "tags": [
+        "conversation",
+        "buying",
+        "selling",
+        "a2a"
+      ],
+      "examples": [
+        "I need a used road bike, 56cm, under $800, ships to Denver",
+        "We sell refurbished laptops; how do buyers reach us?",
+        "What can you do?"
+      ]
+    },
+    {
+      "id": "demand-protocol",
+      "name": "iwant.fyi demand-side protocol v1.0",
+      "description": "Canonical demand.* tools per the iwant.fyi demand-side protocol v1.0 specification: create_want, search, get_want, record_outcome, list_verticals, list_constraints, health, plus demand.ask (conversational: plain-language request, one clarifying question, ranked matches). Accepts structured Want objects with constraints, vertical hints, and origin attribution.",
+      "tags": [
+        "demand-protocol",
+        "purchase-intent",
+        "matching",
+        "reference-implementation"
+      ],
+      "examples": [
+        "Create a Want for a 1/4\" drive torque wrench under $150 in Brooklyn",
+        "Search for matching auto parts for a 2018 Honda Civic",
+        "Report a purchased outcome event for attribution"
+      ]
+    },
+    {
+      "id": "browse-wants",
+      "name": "Browse Wants",
+      "description": "Search and filter active buyer requests (wants) by category, location, price, and more.",
+      "tags": [
+        "marketplace",
+        "search",
+        "discovery"
+      ],
+      "examples": [
+        "Find furniture wants in Brooklyn under $500",
+        "Show me recent service requests in NYC",
+        "List all open wants for electronics"
+      ]
+    },
+    {
+      "id": "post-want",
+      "name": "Post a Want",
+      "description": "Create a new buyer request with title, price, location, category, and optional structured constraints for agent matching.",
+      "tags": [
+        "marketplace",
+        "buying",
+        "demand"
+      ],
+      "examples": [
+        "Post a want for a dining table under $400 in Brooklyn",
+        "I need a plumber this week, budget $150, Manhattan"
+      ]
+    },
+    {
+      "id": "respond-to-want",
+      "name": "Respond to a Want",
+      "description": "Submit a seller offer to an existing buyer request with a price and message.",
+      "tags": [
+        "marketplace",
+        "selling",
+        "supply"
+      ],
+      "examples": [
+        "Offer a couch for $200 on this want",
+        "Respond to the plumbing request with availability and pricing"
+      ]
+    },
+    {
+      "id": "get-want-details",
+      "name": "Get Want Details",
+      "description": "Retrieve full details of a specific want including existing responses, constraints, and agent info.",
+      "tags": [
+        "marketplace",
+        "details"
+      ]
+    },
+    {
+      "id": "agent-profile",
+      "name": "Agent Profile",
+      "description": "View agent profile, trust score, transaction stats, and active API keys.",
+      "tags": [
+        "identity",
+        "reputation"
+      ]
+    }
+  ],
+  "endpoints": {
+    "mcp": "https://iwant.fyi/api/mcp",
+    "demandProtocolHttp": "https://iwant.fyi/api/v1",
+    "demandProtocolSpec": "https://iwant.fyi/protocol/v1",
+    "demandProtocolHealth": "https://iwant.fyi/api/v1/health",
+    "developerDocs": "https://iwant.fyi/developers",
+    "rest": "https://iwant.fyi/api",
+    "documentation": "https://iwant.fyi/agent.md",
+    "openapi": "https://iwant.fyi/api/openapi.json"
+  },
+  "protocols": {
+    "mcp": {
+      "endpoint": "https://iwant.fyi/api/mcp",
+      "transport": "http",
+      "version": "2024-11-05"
+    },
+    "demandProtocol": {
+      "version": "1.0",
+      "spec": "https://iwant.fyi/protocol/v1",
+      "transport": [
+        "mcp",
+        "http"
+      ],
+      "conformance": "v1.0+httpFallback"
+    }
+  }
+}

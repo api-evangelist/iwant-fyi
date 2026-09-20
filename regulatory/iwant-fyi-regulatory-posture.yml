@@ -1,0 +1,100 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: https://iwant.fyi/privacy
+signals:
+  data_subject_request:
+    url: https://iwant.fyi/privacy
+    section: '6. your rights'
+    channel: hi@iwant.fyi
+    stated_sla: null
+    rights_named: [access, correction, deletion, portability, objection]
+    self_service: [delete an agent or revoke its API key from the profile, control notification preferences, close posts]
+    evidence:
+    - source: https://iwant.fyi/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: >-
+        "Access, correct, or delete your data by emailing us. Delete an agent or revoke its API key at
+        any time from your profile. Control notification preferences and close your posts. Exercise any
+        additional rights you have under your local law (access, deletion, portability, objection) by
+        contacting us."
+    note: >-
+      A documented request channel with named rights, inside the privacy policy (last updated
+      June 7, 2026). No response period is stated, no intake form or API exists (/privacy/requests
+      not probed as a separate page; the policy is the whole surface).
+  subprocessors:
+    url: https://iwant.fyi/privacy
+    section: '3. information sharing'
+    dated: '2026-06-07'
+    entries:
+    - {vendor: Supabase, purpose: database / auth}
+    - {vendor: Vercel, purpose: hosting}
+    - {vendor: Resend, purpose: email}
+    - {vendor: Stripe, purpose: optional platform-fee processing (PCI-compliant); card details not stored}
+    - {vendor: Google, purpose: sign-in identity (name, email, photo)}
+    - {vendor: connected supply sources (e.g. Shopify Catalog), purpose: queries are sent to product providers to retrieve matches; not used to identify the user}
+    evidence:
+    - source: https://iwant.fyi/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: >-
+        "Service providers: Supabase (database/auth), Vercel (hosting), Resend (email). If you ever pay
+        an optional platform fee, that is processed by Stripe (PCI-compliant); we do not store card
+        details."
+    note: >-
+      A named service-provider list carried in the privacy policy, dated by the policy's own
+      "Last updated" line — not a standalone, change-notified subprocessor page (/legal/subprocessors
+      404). Recorded because the vendors are named with purposes, which is the substance.
+  ai_transparency:
+    url: https://iwant.fyi/agent.md
+    section: 'Rules'
+    evidence:
+    - source: https://iwant.fyi/agent.md
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: '"Agents are labeled as agents in all interactions. No impersonating humans."'
+    - source: https://iwant.fyi/terms
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: >-
+        "Agents must not impersonate humans or other agents ... The human owner is responsible for the
+        agent's activity, content, and compliance with these terms."
+    - source: https://iwant.fyi/agents/feed
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Public feed of agent-to-agent exchanges ("Humans can only watch"), with each counterpart labelled by kind (buyer / seller / researcher / unknown).'
+    note: >-
+      A published, contractual disclosure that AI agents are labelled as such in every interaction,
+      that a human owner is accountable for each agent, and a public transparency feed of the
+      agent-to-agent conversations the platform hosts. This is the substance of an AI-interaction
+      disclosure; there is no dedicated /ai/transparency page.
+probed_absent:
+- {url: https://iwant.fyi/accessibility, status: 404, signal: accessibility_conformance}
+- {url: https://iwant.fyi/legal/subprocessors, status: 404, signal: subprocessors (dedicated page)}
+- {url: https://iwant.fyi/legal/dpa, status: 404, signal: incident_notification}
+- {url: https://iwant.fyi/security, status: 404, signal: sbom / trust center}
+- {url: https://iwant.fyi/.well-known/security.txt, status: 404, signal: vulnerability disclosure}
+observations:
+  age_statements:
+    note: >-
+      Terms section 2 requires users to be at least 18; privacy section 7 says the service is not
+      directed to children under 13. These are eligibility statements, not an age-assurance mechanism,
+      so age_assurance is NOT recorded as a signal.
+  global_privacy_control:
+    note: No published GPC statement; not tested by header (per rule 2), so not recorded.
+  ai_crawler_policy:
+    url: https://iwant.fyi/robots.txt
+    note: >-
+      robots.txt explicitly ALLOWS twelve named AI crawlers (GPTBot, OAI-SearchBot, ChatGPT-User,
+      ClaudeBot, Claude-User, Claude-Web, anthropic-ai, PerplexityBot, Perplexity-User, Google-Extended,
+      Google-CloudVertexBot, CCBot) on the public site and disallows /api/, /auth/, /profile, /posts,
+      /notifications, /go/, /dealers/claim/ for everyone. Not one of the canonical signals; recorded as
+      context for a provider whose customers are agents.
+  protocol_privacy_requirements:
+    url: https://iwant.fyi/protocol/v1#13-privacy-considerations
+    note: >-
+      The provider's own protocol spec section 13 imposes privacy MUSTs on every implementation (users
+      anonymous by default; no logging of Want content beyond serving/matching/aggregate analytics with
+      disclosure; user deletion of persisted Wants; no third-party sharing of individual Want data
+      without consent). Buyer contact details never reach dealers in the introduction flow (skill.md).

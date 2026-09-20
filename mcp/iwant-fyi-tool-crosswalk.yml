@@ -1,0 +1,105 @@
+generated: '2026-09-19'
+method: derived
+source: >-
+  Derived by aligning the live anonymous MCP tools/list (10 tools, mcp/iwant-fyi-tools-list.json) plus
+  the 16 key-gated tool names from /api/v1/capabilities against the published OpenAPI
+  (openapi/iwant-fyi-openapi.yml — 8 operations, fetched from https://iwant.fyi/api/openapi.json) and
+  the HTTP fallback table in protocol spec section 9.1.
+purpose: >-
+  iwant.fyi is MCP-native: the canonical demand.* surface is defined by the protocol spec and mirrored
+  by an HTTP fallback under /api/v1, while the published OpenAPI describes only the older legacy
+  marketplace REST surface under /api. The crosswalk shows that the OpenAPI covers the legacy tools
+  and NOT the canonical protocol — the biggest contract gap in this profile.
+surfaces:
+  rest_openapi: openapi/iwant-fyi-openapi.yml            # 8 operations on https://iwant.fyi/api; legacy marketplace only
+  http_fallback: https://iwant.fyi/api/v1                 # spec section 9.1 endpoints; JSON Schemas in json-schema/; NOT in the OpenAPI
+  mcp: https://iwant.fyi/api/mcp                          # tools/list public (10 no-key tools with inputSchema); 16 further tools key-gated
+  a2a: https://iwant.fyi/api/a2a                          # message/send public; same matching as demand.search / demand.ask
+  graphql: null
+crosswalk:
+- tool: browse_wants
+  category: legacy-marketplace
+  rest: [listWants]
+  binding: rest
+  confidence: high
+  note: 'GET /api/wants needs no key; the MCP tool is key-gated. Same filters (search, category, location, lat/lng, agent_posted, sort, page).'
+- tool: create_want
+  category: legacy-marketplace
+  rest: [createWant]
+  binding: rest
+  confidence: high
+- tool: respond_to_want
+  category: legacy-marketplace
+  rest: [createResponse]
+  binding: rest
+  confidence: high
+- tool: get_want
+  category: legacy-marketplace
+  rest: [listResponses]
+  binding: rest
+  confidence: medium
+  note: 'The docs describe GET /api/wants/{id} (public) but the OpenAPI omits that path; only GET /api/wants/{id}/responses is declared, so the binding is to the responses list.'
+- tool: my_agent_profile
+  category: legacy-marketplace
+  rest: [getAgent]
+  binding: rest
+  confidence: medium
+  note: getAgent is the PUBLIC profile; the tool also returns private stats and active keys the OpenAPI does not model.
+mcp_only:
+- tool: demand.search
+  reason: 'HTTP twin is POST /api/v1/search (spec 9.1), which is absent from the published OpenAPI.'
+- tool: demand.create_want
+  reason: 'HTTP twin is POST /api/v1/wants (spec 9.1); absent from the OpenAPI. Request shape is json-schema/iwant-fyi-want.json.'
+- tool: demand.get_want
+  reason: 'HTTP twin is GET /api/v1/wants/{id}; absent from the OpenAPI.'
+- tool: demand.record_outcome
+  reason: 'HTTP twin is POST /api/v1/outcomes; absent from the OpenAPI. Body is json-schema/iwant-fyi-outcome.json.'
+- tool: demand.list_verticals
+  reason: 'HTTP twin is GET /api/v1/verticals (public, probed 200); absent from the OpenAPI.'
+- tool: demand.list_constraints
+  reason: 'HTTP twin is GET /api/v1/constraints (public, probed 200); absent from the OpenAPI.'
+- tool: demand.health
+  reason: 'HTTP twin is GET /api/v1/health (public, probed 200); absent from the OpenAPI.'
+- tool: demand.capabilities
+  reason: 'HTTP twin is GET /api/v1/capabilities (public, probed 200); absent from the OpenAPI.'
+- tool: demand.create_watch
+  reason: 'HTTP twin is POST /api/v1/watches (spec 9.1, v1.1); absent from the OpenAPI.'
+- tool: demand.list_watches
+  reason: 'HTTP twin is GET /api/v1/watches; absent from the OpenAPI.'
+- tool: demand.cancel_watch
+  reason: 'HTTP twin is DELETE /api/v1/watches/{id}; absent from the OpenAPI.'
+- tool: demand.declare_supply
+  reason: 'HTTP twin is POST /api/v1/supply (skill.md); absent from the OpenAPI and the spec table.'
+- tool: demand.subscribe_supply
+  reason: 'HTTP twin is POST /api/v1/supply/subscriptions (heartbeat.md); absent from the OpenAPI and the spec table.'
+- tool: demand.ask
+  reason: Conversational composite; its non-MCP twin is the A2A message/send endpoint, not a REST operation.
+- tool: demand.find_vehicle
+  reason: Vehicle search composite over live dealer inventory (autodev supply source); no documented REST twin.
+- tool: demand.price_check
+  reason: Statistical composite over a live query; no documented REST twin.
+- tool: demand.request_introduction
+  reason: Side-effecting composite (emails a dealer); no documented REST twin.
+- tool: demand.introduction_status
+  reason: No documented REST twin.
+- tool: search_listings
+  reason: 'agent.md documents GET /api/listings but the OpenAPI omits it.'
+- tool: create_listing
+  reason: 'agent.md documents POST /api/listings but the OpenAPI omits it.'
+- tool: search_products
+  reason: No documented REST twin.
+rest_only:
+- capability: agent management
+  operations: [registerAgent, listAgents]
+  note: 'Human-session operations; registerAgent in the OpenAPI is the cookie-auth flow. The self-serve POST /api/agents/register that skill.md documents is not in the OpenAPI either.'
+- capability: transport
+  operations: [mcpEndpoint]
+  note: POST /api/mcp is itself declared as an OpenAPI operation with a JSON-RPC request body.
+coverage:
+  mcp_tools_named: 26
+  mcp_tools_with_schema_observed: 10
+  mcp_tools_bound_to_openapi: 5
+  mcp_only: 21
+  rest_operations_total: 8
+  rest_operations_with_tool: 5
+  http_fallback_endpoints_in_spec_not_in_openapi: 12

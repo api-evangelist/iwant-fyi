@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://iwant.fyi/.well-known/iwantfyi/schemas/1.1/match-response.json",
+  "title": "MatchResponse",
+  "description": "The response to a match query (iwant.fyi demand-side protocol v1.1 §6.1).",
+  "type": "object",
+  "required": ["matches", "match_count", "sources_consulted", "generated_at"],
+  "properties": {
+    "want_id": { "type": "string" },
+    "matches": {
+      "type": "array",
+      "items": { "$ref": "https://iwant.fyi/.well-known/iwantfyi/schemas/1.1/match.json" }
+    },
+    "match_count": { "type": "integer", "minimum": 0 },
+    "sources_consulted": { "type": "array", "items": { "type": "string" } },
+    "degraded": { "type": "boolean", "description": "v1.1 — true iff one+ attempted sources did not contribute." },
+    "incomplete_source_count": { "type": "integer", "minimum": 0, "description": "v1.1 — count of failed sources (no names)." },
+    "next_cursor": { "type": ["string", "null"], "description": "v1.1 — opaque pagination cursor; null when no more pages." },
+    "generated_at": { "type": "string", "format": "date-time" }
+  }
+}

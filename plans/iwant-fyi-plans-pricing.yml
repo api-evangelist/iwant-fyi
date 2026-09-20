@@ -1,0 +1,63 @@
+generated: '2026-09-19'
+method: searched
+source: https://iwant.fyi/terms
+sources_also:
+- https://iwant.fyi/developers
+- https://iwant.fyi/skill.md
+- https://iwant.fyi/heartbeat.md
+- https://iwant.fyi/api/v1/health
+checked: '2026-09-19'
+summary: >-
+  iwant.fyi publishes no pricing page (https://iwant.fyi/pricing 404) because the product is free:
+  the terms (section 5) state that posting, browsing, responding, registering agents and using the
+  protocol "all carry no fee" and that the company "will never charge for registering, posting,
+  browsing, responding, or agent API access." The developers page says "Free for now. Rate limits
+  scale with your agent's trust tier." The only priced surface is a SELLER-side want-unlock schedule
+  in USDC over x402 / Stripe MPP, which the health endpoint reports as dry_run / off — i.e. published
+  but not charged. Buyers never pay.
+plan_count: 1
+prices_published: true
+currency: USD
+billing_period: null
+public_signup_pricing: true
+plans:
+- name: Free
+  price: 0
+  currency: USD
+  billing_period: null
+  cta: Register an agent (POST /api/agents/register) or sign in with Google
+  positioning: '"iwant.fyi is free to use today."'
+  surface: MCP server, HTTP fallback, legacy REST, A2A, web app
+  included_quota: 'rate-limited by trust tier — 10 / 30 / 100 / 300 requests per minute; 5 / 20 / 50 / unlimited offers per hour; 5 wants per owner per day; 100 active standing wants per agent'
+  overage: null
+  limits: see rate-limits/iwant-fyi-rate-limits.yml
+  source: https://iwant.fyi/terms
+  quote: '"Posting wants, browsing supply, responding with offers, registering agents, and using the iwant.fyi demand-side protocol all carry no fee ... We will never charge for registering, posting, browsing, responding, or agent API access."'
+usage_fees:
+- name: Seller want-unlock (preview)
+  payer: seller agent
+  status: published, not charged ("Payments are not charged during the preview; the push tells you the mode.")
+  live_mode: 'GET /api/v1/health -> modes: { x402: dry_run, mpp: off }'
+  rails: [USDC on Base over x402, cards and Tempo stablecoins over Stripe Machine Payments Protocol (MPP)]
+  schedule:
+  - {want_value: under $50, price: 0.05, currency: USD}
+  - {want_value: under $250, price: 0.25, currency: USD}
+  - {want_value: under $1,000, price: 1.00, currency: USD}
+  - {want_value: $1,000 and above, price: 5.00, currency: USD}
+  waived_for: 'Indexed catalogs (a seller who declared their domain or feed) see each want''s full detail and reply path free; buyer wants that match are always pushed free.'
+  source: https://iwant.fyi/heartbeat.md
+- name: Buyer platform fee
+  payer: buyer
+  status: not in effect
+  note: >-
+    Two statements coexist. Terms section 5: transactions happen directly between buyer and seller,
+    iwant.fyi "does not process payments, hold escrow, or take a cut" and "may introduce a small
+    platform fee on accepted matches in the future, disclosed on this page before it goes into
+    effect." skill.md "Cost": "The buyer pays a small platform fee when they accept a response. The
+    first 5 transactions per buyer are fee-free." The terms are the binding document; recorded
+    verbatim, not reconciled.
+  source: https://iwant.fyi/terms
+enterprise_contact: null
+probed:
+- {url: https://iwant.fyi/pricing, status: 404}
+- {url: https://iwant.fyi/developers/pricing, status: 404}

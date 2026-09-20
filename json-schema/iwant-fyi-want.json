@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://iwant.fyi/.well-known/iwantfyi/schemas/1.1/want.json",
+  "title": "Want",
+  "description": "Structured purchase intent (iwant.fyi demand-side protocol v1.1 §4).",
+  "type": "object",
+  "required": ["id", "protocol_version", "title", "price_cents", "price_currency"],
+  "properties": {
+    "id": { "type": "string", "description": "Implementation-assigned UUID." },
+    "protocol_version": { "type": "string", "enum": ["1.0", "1.1"] },
+    "title": { "type": "string", "minLength": 5, "maxLength": 200 },
+    "description": { "type": "string", "maxLength": 2000 },
+    "category": { "type": "string", "enum": ["goods", "services", "other"] },
+    "vertical": { "type": "string" },
+    "mode": { "type": "string", "enum": ["new", "used", "any"] },
+    "price_cents": { "type": "integer", "minimum": 0 },
+    "price_currency": { "type": "string", "description": "ISO 4217 code." },
+    "location": {
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "lat": { "type": "number" },
+        "lng": { "type": "number" },
+        "radius_km": { "type": "number" }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "rules": { "type": "object" },
+        "negotiable": { "type": "array", "items": { "type": "string" } },
+        "auto_accept": { "type": ["object", "null"] }
+      }
+    },
+    "origin": {
+      "type": "object",
+      "properties": {
+        "agent_id": { "type": "string" },
+        "agent_name": { "type": "string" },
+        "session_id": { "type": "string" }
+      }
+    },
+    "client_token": { "type": "string", "maxLength": 128 },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}

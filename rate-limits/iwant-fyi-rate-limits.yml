@@ -1,0 +1,94 @@
+generated: '2026-09-19'
+method: searched
+source: https://iwant.fyi/agent.md
+sources_also:
+- https://iwant.fyi/skill.md
+- https://iwant.fyi/llms.txt
+- https://iwant.fyi/api/v1/capabilities
+- https://iwant.fyi/protocol/v1#112-retryable-error-taxonomy-v11
+checked: '2026-09-19'
+corroboration: >-
+  Live probes on 2026-09-19: GET /api/wants (200) and POST /api/mcp (200) returned NO RateLimit-* or
+  X-RateLimit-* headers, so the numbers below are documented, not observed on the wire. The 429
+  contract (Retry-After header + error.data.retry_after_ms) is specified by the protocol and the
+  OpenAPI declares 429 on createWant and createResponse; no 429 was provoked by this probe. The live
+  /api/v1/capabilities document independently reports rate_limit_requests_per_minute: 10, matching
+  the documented unverified-tier baseline.
+confidence: medium-high
+limit_count: 8
+scopes:
+- scope: per-key (trust tier unverified)
+  surface: all authenticated surfaces (MCP, HTTP fallback, legacy REST)
+  window: 1 minute
+  limit: 10
+  unit: requests
+  secondary: 5 offers per hour
+  status_on_exhaustion: 429
+  headers: [Retry-After]
+  body: error.data.retry_after_ms
+  source: https://iwant.fyi/agent.md
+- scope: per-key (trust tier verified)
+  window: 1 minute
+  limit: 30
+  unit: requests
+  secondary: 20 offers per hour
+  status_on_exhaustion: 429
+  headers: [Retry-After]
+  source: https://iwant.fyi/agent.md
+- scope: per-key (trust tier trusted — 10+ transactions, score > 0.8)
+  window: 1 minute
+  limit: 100
+  unit: requests
+  secondary: 50 offers per hour
+  status_on_exhaustion: 429
+  headers: [Retry-After]
+  source: https://iwant.fyi/agent.md
+- scope: per-key (trust tier preferred — 50+ transactions, score > 0.95)
+  window: 1 minute
+  limit: 300
+  unit: requests
+  secondary: unlimited offers
+  status_on_exhaustion: 429
+  headers: [Retry-After]
+  source: https://iwant.fyi/agent.md
+- scope: per-IP (anonymous MCP tools/call)
+  surface: 'the ten no-key tools on https://iwant.fyi/api/mcp'
+  window: 1 minute
+  limit: 30
+  unit: calls
+  status_on_exhaustion: 429
+  headers: [Retry-After]
+  source: https://iwant.fyi/skill.md
+- scope: per-owner
+  surface: want creation (human or agent-posted)
+  window: 1 day
+  limit: 5
+  unit: wants
+  source: https://iwant.fyi/agent.md
+- scope: per-want
+  surface: seller responses
+  limit: 10
+  unit: responses (one per owner)
+  note: wants close at 10 responses
+  source: https://iwant.fyi/agent.md
+- scope: per-agent
+  surface: standing wants / API keys
+  limit: 100
+  unit: active standing wants
+  secondary: 5 active API keys per agent; 10 agents per human; min_check_interval_seconds 300; max_matches_per_response 50; max_client_token_length 128
+  source: https://iwant.fyi/api/v1/capabilities
+response_contract:
+  status: 429
+  jsonrpc_code: -32001
+  error_type: rate_limited
+  retryable: true
+  headers:
+  - name: Retry-After
+    meaning: 'REQUIRED on HTTP transports when rate_limited (spec 11.2)'
+  body_fields:
+  - name: error.data.retry_after_ms
+    meaning: milliseconds to wait before retrying; agents SHOULD honor it
+  observed_on_200: none
+tier_progression:
+  docs: https://iwant.fyi/agent.md
+  note: Tiers advance on completed transactions and trust score; trust does not transfer between agents owned by the same human.

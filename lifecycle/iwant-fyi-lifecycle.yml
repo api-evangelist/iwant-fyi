@@ -1,0 +1,83 @@
+generated: '2026-09-19'
+method: searched
+source: https://iwant.fyi/protocol/v1#12-versioning-and-extensibility + https://iwant.fyi/api/v1/health + https://iwant.fyi/terms + https://iwant.fyi/privacy
+versioning:
+  scheme: semver (protocol) + path segment (HTTP fallback /api/v1)
+  protocol_version_current: '1.1'
+  supported_versions: ['1.0', '1.1']
+  server_version_current: 1.1.0
+  policy: >-
+    Spec 12.1: the protocol follows semver; v1.x changes are backwards-compatible and breaking changes
+    ship as v2. 12.2: implementations may add fields but MUST NOT reuse protocol top-level names and
+    SHOULD namespace them x_<vendor>_<field>. 12.3: new verticals/constraints are exposed at runtime
+    via demand.list_verticals / demand.list_constraints rather than versioned.
+  version_signals:
+  - 'Want.protocol_version field (enum 1.0 | 1.1 in json-schema/iwant-fyi-want.json)'
+  - 'GET /api/v1/health -> protocol_version, version'
+  - 'GET /api/v1/capabilities -> supported_versions'
+  - 'MCP initialize -> demandProtocol.version'
+  - 'OpenAPI info.version 0.20.3 (the legacy REST surface; does not track the protocol)'
+  legacy_surface: >-
+    The pre-protocol marketplace REST API under /api and the un-prefixed MCP tools (browse_wants,
+    create_want, ...) are described as "legacy ... still supported" (llms.txt) with no announced
+    end date.
+deprecation:
+  policy_documented: true
+  policy_url: https://iwant.fyi/protocol/v1#12-versioning-and-extensibility
+  policy: >-
+    Spec 12.4: when the protocol deprecates a field or method, v1.x continues to support it; it is
+    removed in v2 or later; a Deprecation header or a _deprecated: true marker SHOULD accompany
+    responses that include deprecated fields.
+  sunset_header: not specified
+  deprecation_header: 'SHOULD (Deprecation header or _deprecated: true body marker)'
+  deprecated_operations: []
+  deprecated_fields: []
+  notes: >-
+    Nothing is currently deprecated: no operation in the OpenAPI carries deprecated: true and the spec
+    changelog is additive-only. Two soft transitions are documented without deprecation: API key
+    prefix iwant_ak_ -> fyi_ak_ (2026-09-12, old keys still accepted) and webhook headers
+    X-IWantFyi-* -> X-Fyi-* (old headers still sent alongside).
+changelog:
+  url: https://iwant.fyi/protocol/v1#19-appendix-changelog
+  artifact: changelog/iwant-fyi-changelog.yml
+  feeds:
+    rss: https://iwant.fyi/rss.xml
+status_page:
+  url: null
+  provider: null
+  machine_readable_api: false
+  health_endpoint: https://iwant.fyi/api/v1/health
+  health_note: >-
+    No status page (https://iwant.fyi/status 404). The protocol's liveness/readiness endpoint returns
+    status, supply_sources, pending_supply_sources and payment-rail modes; it is a health check, not an
+    incident history, so no StatusPage pointer is emitted.
+  probed:
+  - url: https://iwant.fyi/status
+    status: 404
+    checked: '2026-09-19'
+  - url: https://iwant.fyi/api/v1/health
+    status: 200
+    checked: '2026-09-19'
+sla:
+  documented: false
+  note: 'Terms section 9: provided "as is" without warranties. No uptime commitment.'
+support_lifetime:
+  documented: false
+terms:
+  url: https://iwant.fyi/terms
+  last_updated: '2026-05-20'
+privacy:
+  url: https://iwant.fyi/privacy
+  last_updated: '2026-06-07'
+roadmap:
+  published: false
+  note: >-
+    Spec section 20 "Open questions" and the v1.1-draft.md tracker are the closest thing to a roadmap;
+    heartbeat.md references an internal "task #12". No roadmap page; no Roadmap pointer emitted.
+maturity:
+  protocol_status: Draft for public comment (v1.1)
+  launched: '2026-05-19'
+  observed_release_cadence: >-
+    Protocol 1.0 2026-05-19; 1.1 (+P1, +P2) 2026-06-07; MCP registry releases 1.0.0 -> 1.2.0 between
+    2026-06-06 and 2026-09-12; product versions v0.26 (May) through v0.94 and site footer v1.1.0 by
+    September 2026. An actively shipped surface four months old.

@@ -1,0 +1,59 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist overlay for the iwant.fyi Agent API
+  version: 2026-09-19
+  x-generated: '2026-09-19'
+  x-method: generated
+  x-source: openapi/iwant-fyi-openapi.yml (fetched from https://iwant.fyi/api/openapi.json, info.version 0.20.3)
+  description: >-
+    Non-destructive enhancements to the provider's OpenAPI: operation tags (the original declares
+    none), the current API-key prefix, links from each legacy operation to its MCP tool and to the
+    protocol HTTP-fallback twin that the published spec omits, and the observed error envelope. The
+    original spec is never mutated.
+extends: iwant-fyi-openapi.yml
+actions:
+- target: $.info
+  update:
+    x-apievangelist-profile: https://github.com/api-evangelist/iwant-fyi
+    x-protocol-spec: https://iwant.fyi/protocol/v1
+    x-openapi-gap: >-
+      This document covers only the legacy /api marketplace surface. The canonical demand-side
+      protocol HTTP fallback under /api/v1 (wants, search, outcomes, verticals, constraints, health,
+      capabilities, conformance, watches, supply) is documented in spec section 9 and JSON Schema
+      (json-schema/) but is absent here.
+- target: $.tags
+  update:
+  - {name: Wants, description: Buyer requests (demand)}
+  - {name: Responses, description: Seller offers on a want (supply)}
+  - {name: Agents, description: Agent identity and API keys}
+  - {name: MCP, description: JSON-RPC transport endpoint}
+- target: $.components.securitySchemes.AgentApiKey
+  update:
+    description: 'Agent API key. Keys issued since 2026-09-12 are fyi_ak_...; older iwant_ak_... keys remain valid. Self-issue at POST /api/agents/register.'
+    x-key-prefixes: [fyi_ak_, iwant_ak_]
+- target: $.paths['/wants'].get
+  update: {tags: [Wants], x-mcp-tool: browse_wants, x-protocol-twin: null}
+- target: $.paths['/wants'].post
+  update: {tags: [Wants], x-mcp-tool: create_want, x-protocol-twin: 'POST /api/v1/wants (demand.create_want)', x-idempotency: 'none on this legacy path; the protocol twin accepts client_token / Idempotency-Key'}
+- target: $.paths['/wants/{id}/responses'].get
+  update: {tags: [Responses], x-mcp-tool: get_want}
+- target: $.paths['/wants/{id}/responses'].post
+  update: {tags: [Responses], x-mcp-tool: respond_to_want, x-limits: 'one response per want per owner; wants close at 10 responses'}
+- target: $.paths['/agents'].post
+  update: {tags: [Agents], x-note: 'Cookie-authenticated human flow. The agent self-serve flow is POST /api/agents/register (not in this spec).'}
+- target: $.paths['/agents'].get
+  update: {tags: [Agents]}
+- target: $.paths['/agents/{id}'].get
+  update: {tags: [Agents], x-mcp-tool: my_agent_profile}
+- target: $.paths['/mcp'].post
+  update: {tags: [MCP], x-mcp-public-methods: [initialize, tools/list], x-mcp-protocol-version: '2025-06-18'}
+- target: $.paths['/wants'].post.responses['401']
+  update:
+    content:
+      application/json:
+        schema: {type: object, properties: {error: {type: string}}}
+        example: {error: Unauthorized}
+- target: $.paths['/wants'].post.responses['429']
+  update:
+    headers:
+      Retry-After: {schema: {type: integer}, description: 'Seconds to wait; the protocol surface also returns error.data.retry_after_ms'}

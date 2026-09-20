@@ -1,0 +1,35 @@
+generated: '2026-09-19'
+method: searched
+source: https://github.com/staugs/iwantfyi-spec/tree/main/conformance-kit
+sources_also:
+- https://iwant.fyi/developers
+- https://www.npmjs.com/package/@iwantfyi/conformance-kit
+name: iwantfyi-conformance
+package: '@iwantfyi/conformance-kit'
+kind: conformance-test CLI
+official: true
+version: 1.1.0
+published: '2026-06-08'
+license: Apache-2.0
+scope_note: >-
+  This is NOT a general API client CLI. It is a first-party command-line tool that verifies any
+  implementation of the iwant.fyi demand-side protocol against spec section 15 — the reference
+  server included. It is recorded as the provider's only CLI; there is no `iwant` command for
+  creating wants or searching from a shell.
+install:
+- 'npx @iwantfyi/conformance-kit --mcp https://iwant.fyi/api/mcp --http https://iwant.fyi/api/v1 --api-key <key>'
+- 'node --experimental-strip-types tools/conformance-kit/src/index.ts --mcp ... --http ... --api-key ... (from source)'
+binary: iwantfyi-conformance
+arguments:
+- {flag: --mcp <url>, required: true, meaning: MCP endpoint to test}
+- {flag: --http <url>, required: false, meaning: HTTP fallback root; enables the section 9 checks}
+- {flag: --api-key <key>, required: true, meaning: bearer key for the implementation}
+- {flag: '--verbose, -v', meaning: verbose output}
+- {flag: '--help, -h', meaning: help}
+checks:
+  required: [8.1 required MCP tools present, 4 Want creation accepts canonical shape, 6 Match response shape valid, 7 Outcome event accepted]
+  v1_1_warn_only: [16 signed webhooks, 6.1 partial-result transparency, 11.2 retryable error taxonomy, 8.4 idempotency, 8.2 capability discovery, 6.3 deterministic ordering, 15 published schemas]
+  exit_code: 0 when all required checks pass; non-zero otherwise; v1.1 gaps are WARN
+  claim_note: With an unclaimed key the write-path checks report WARN claim_required; re-run with a claimed key for the full write path.
+expected_output: '[PASS] section 8.1 ... COMPLIANT v1.0+httpFallback'
+live_counterpart: https://iwant.fyi/api/v1/conformance

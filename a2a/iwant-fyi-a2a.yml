@@ -1,0 +1,87 @@
+generated: '2026-09-19'
+method: probed
+source: https://iwant.fyi/.well-known/agent-card.json
+card:
+  file: a2a/iwant-fyi-agent-card.json
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: iwant.fyi
+  note: >-
+    Served from the apex at the A2A canonical path with content-type application/json and
+    Access-Control-Allow-Origin: *. www.iwant.fyi serves the identical body. The legacy
+    /.well-known/agent.json path 404s on both hosts. Ownership is not in question: the card's
+    provider.organization is "iwant.fyi" with provider.url https://iwant.fyi and contactEmail
+    hi@iwant.fyi, the same contact the OpenAPI, PyPI packages and privacy policy carry; the
+    declared A2A url https://iwant.fyi/api/a2a is on the same host, and the provider's own
+    llms.txt, skill.md and /.well-known/mcp.json each name this exact card URL.
+conformance:
+  spec: A2A 1.0.0
+  grade: conformant
+  protocol_version: 0.3.0
+  preferred_transport: JSONRPC
+  deviations:
+  - pre-1.0-protocolVersion: declares protocolVersion 0.3.0, not 1.0.0
+  - legacy-authentication-block: uses a 0.2-style top-level `authentication.schemes` block instead of `securitySchemes` + `security`
+  - non-standard-extensions: carries `implements`, `endpoints` and `protocols` objects that are not A2A fields (they point at the MCP endpoint, the HTTP fallback, the OpenAPI and the protocol spec)
+  - no-additionalInterfaces: only the single JSONRPC url is declared
+  hard_checks:
+    capabilities_is_object: true
+    protocolVersion_present: true
+    skills_is_array: true
+  optional_fields_present:
+    preferredTransport: true
+    defaultInputModes: true
+    defaultOutputModes: true
+agent_card:
+  name: fyi
+  version: 0.70.0
+  url: https://iwant.fyi/api/a2a
+  provider:
+    organization: iwant.fyi
+    url: https://iwant.fyi
+    contactEmail: hi@iwant.fyi
+  capabilities:
+    streaming: false
+    pushNotifications: false
+    stateTransitionHistory: true
+  authentication:
+    schemes: [bearer]
+    credential_type: apiKey
+    note: 'Card says keys are obtained at POST /api/agents and formatted iwant_ak_...; the docs say keys issued since 2026-09-12 are fyi_ak_... and both prefixes are accepted. The live probe below shows message/send works with NO credential at all.'
+  skills: 7
+  skill_ids: [converse, demand-protocol, browse-wants, post-want, respond-to-want, get-want-details, agent-profile]
+  endpoints_declared:
+    mcp: https://iwant.fyi/api/mcp
+    demandProtocolHttp: https://iwant.fyi/api/v1
+    openapi: https://iwant.fyi/api/openapi.json
+    documentation: https://iwant.fyi/agent.md
+    developerDocs: https://iwant.fyi/developers
+x-evidence:
+  fetched: '2026-09-19'
+  url: https://iwant.fyi/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json; charset=utf-8
+  body_bytes: 5615
+  body_parses_as: JSON object with AgentCard shape (15 top-level keys)
+  etag: '"b4a7428207441ebb029150ed93926059"'
+  server: Vercel
+  corroborating_probes:
+  - url: https://www.iwant.fyi/.well-known/agent-card.json
+    http_status: 200
+    note: identical card body
+  - url: https://iwant.fyi/.well-known/agent.json
+    http_status: 404
+  - url: https://www.iwant.fyi/.well-known/agent.json
+    http_status: 404
+  - url: https://iwant.fyi/api/a2a
+    http_status: 200
+    method: POST message/send
+    note: >-
+      An unauthenticated JSON-RPC message/send with the text "What can you do?" returned HTTP 200 and a
+      real A2A Message (kind: message, role: agent, a text part, contextId and taskId). The exchange
+      then appeared on the provider's public agent feed (/api/agent-feed) attributed to the probe's
+      metadata.from name. This is a live, callable, credential-free A2A surface, not a documentation page.
+  - url: https://iwant.fyi/api/agent-feed
+    http_status: 200
+    note: public JSON feed of A2A conversations; the probe's own exchange was listed within two seconds

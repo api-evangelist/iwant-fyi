@@ -1,0 +1,103 @@
+generated: '2026-09-19'
+method: searched
+source: https://iwant.fyi/protocol/v1#19-appendix-changelog + https://iwant.fyi/rss.xml + https://iwant.fyi/llms.txt + https://iwant.fyi/skill.md + https://registry.modelcontextprotocol.io/v0/servers?search=iwant
+checked: '2026-09-19'
+summary: >-
+  Two change records exist. The protocol spec carries a dated, versioned changelog (section 19) for
+  the protocol itself; the product ships version-tagged feature notes (v0.80 ... v0.94) inside
+  llms.txt and skill.md, mostly undated, plus a dated RSS feed with five launch-day items and dated
+  releases in the Official MCP Registry. No dedicated /changelog page (404).
+scheme:
+  protocol: semver, spec section 19 appendix, dated entries
+  product: 'v0.NN feature tags in agent docs (undated except where noted); site footer "v 1.1.0"'
+  server: 'GET /api/v1/health -> version 1.1.0'
+current_version:
+  protocol: '1.1'
+  server: 1.1.0
+  openapi_info_version: 0.20.3
+  agent_card_version: 0.70.0
+  mcp_registry: 1.2.0
+feeds:
+  rss: https://iwant.fyi/rss.xml
+  agent_feed_rss: https://iwant.fyi/agents/feed/rss.xml
+  probed:
+  - {url: https://iwant.fyi/changelog, status: 404}
+  - {url: https://iwant.fyi/rss.xml, status: 200}
+entries:
+- version: '1.1 P2'
+  date: '2026-06-07'
+  breaking: false
+  kind: protocol
+  highlights:
+  - deterministic total order + cursor pagination (6.3)
+  - well-known provenance/freshness keys in supply_metadata (6.2)
+  - published JSON Schema artifacts + live GET /v1/conformance self-report (15)
+- version: '1.1 P1'
+  date: '2026-06-07'
+  breaking: false
+  kind: protocol
+  highlights:
+  - retryable error taxonomy — error_type + retryable + retry_after_ms, 429 / Retry-After (11.2)
+  - idempotency keys — client_token on create_want / create_watch (8.4)
+  - demand.capabilities tool + /v1/capabilities (8.2)
+- version: '1.1'
+  date: '2026-06-07'
+  breaking: false
+  kind: protocol
+  highlights:
+  - Standing Wants + signed webhook delivery — HMAC-SHA256, one-time secret, replay window, event_id dedupe, at-least-once retry, secret rotation (16)
+  - partial-result transparency on the Match response — degraded + incomplete_source_count (6.1)
+  - demand.create_watch / list_watches / cancel_watch tools + /v1/watches* endpoints
+- version: '1.0'
+  date: '2026-05-19'
+  breaking: false
+  kind: protocol
+  highlights:
+  - initial draft — Want schema, constraint vocabulary, match response, outcome events, MCP tool surface, HTTP fallback, identity, errors, versioning, privacy, security, conformance
+- version: 'launch'
+  date: '2026-05-19'
+  kind: product
+  source: https://iwant.fyi/rss.xml
+  highlights:
+  - 'Why I wrote a new protocol for AI-agent commerce (blog post)'
+  - iwant.fyi MCP server is v1.0 conformant
+  - Four official SDKs released (TypeScript + 3 Python frameworks)
+  - Three open-source example agents shipped
+- version: mcp-registry 1.0.0 / 1.0.1 / 1.1.0
+  date: '2026-06-06'
+  kind: distribution
+  highlights:
+  - 'Official MCP Registry listing fyi.iwant/iwant published 2026-06-06, updated 2026-06-07 (Authorization header required) and 2026-06-09 (1.1.0)'
+- version: v0.80
+  date: null
+  kind: product
+  highlights: ['Cars: demand.find_vehicle searches live dealer inventory and returns exact vehicles with VIN, dealer, distance, accident and owner history']
+- version: v0.81
+  date: null
+  kind: product
+  highlights: ['Sellers: matching wants pushed free; want-detail unlock priced in USDC on Base over x402 ($0.05 / $0.25 / $1 / $5); Stripe MPP as second rail; payments not charged during preview']
+- version: v0.84
+  date: null
+  kind: product
+  highlights: ['No key needed to search over MCP: ten demand.* tools callable without Authorization at 30/min per IP; server addable as a no-auth custom connector']
+- version: v0.87
+  date: null
+  kind: product
+  highlights: ['Introductions: demand.request_introduction emails the dealer via a per-introduction reply address; demand.introduction_status returns the answer; buyer contact details never reach the dealer']
+- version: v0.94
+  date: null
+  kind: product
+  highlights: ['demand.price_check: percentile / median / typical range for one specific car against comparable live listings; insufficient_data instead of guessing']
+- version: key-prefix change
+  date: '2026-09-12'
+  kind: product
+  breaking: false
+  highlights: ['API keys now issued as fyi_ak_ (was iwant_ak_; old keys still accepted); programmatic name is "fyi" — MCP server name, agent card name, User-Agent prefix and X-Fyi-* webhook headers (X-IWantFyi-* still sent alongside)']
+- version: mcp-registry 1.2.0
+  date: '2026-09-12'
+  kind: distribution
+  highlights: ['Registry listing updated: "No key needed" — Authorization header no longer marked required']
+- version: spec repo
+  date: '2026-09-13'
+  kind: docs
+  highlights: ['staugs/iwantfyi-spec README rewritten to lead with the concrete capability (find the exact car) rather than the protocol abstraction']

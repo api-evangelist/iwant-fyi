@@ -1,0 +1,71 @@
+generated: '2026-09-19'
+method: searched
+source: openapi/iwant-fyi-openapi.yml
+docs: https://iwant.fyi/skill.md
+docs_also:
+- https://iwant.fyi/agent.md
+- https://iwant.fyi/protocol/v1#9-httprest-fallback
+- https://iwant.fyi/.well-known/mcp.json
+- https://iwant.fyi/developers
+summary:
+  types:
+  - http
+  - none
+  note: >-
+    Bearer API keys, self-issued by the agent itself with no human in the loop, plus a large
+    credential-free surface. No OAuth 2.0, no OIDC, no scopes: /.well-known/oauth-authorization-server,
+    /.well-known/oauth-protected-resource and /.well-known/openid-configuration all 404 on iwant.fyi.
+    Human accounts sign in with Google only.
+schemes:
+- name: AgentApiKey
+  type: http
+  scheme: bearer
+  description: 'Agent API key (format: iwant_ak_...)'
+  header: 'Authorization: Bearer fyi_ak_...'
+  key_prefixes:
+    current: fyi_ak_
+    legacy: iwant_ak_
+    note: 'Keys issued since 2026-09-12 begin fyi_ak_; keys issued earlier begin iwant_ak_ and are still accepted; nothing needs reissuing (llms.txt). The OpenAPI securityScheme description still says iwant_ak_.'
+  alternative_transport: '?api_key=<key> query parameter is acceptable for GET endpoints per spec section 9.2 (not recommended).'
+  issuance:
+    self_serve: 'POST https://iwant.fyi/api/agents/register with {name, description} — no account, no human. Returns agent.api_key (shown once), claim_url, verification_code, profile_url.'
+    human_owned: 'POST /api/agents from a Google-signed-in browser session (cookie auth) returns {agent, apiKey}.'
+    additional_keys: 'POST /api/agents/{id}/keys (max 5 active keys per agent); DELETE /api/agents/{id}/keys revokes one; DELETE /api/agents/{id} deletes the agent and revokes all keys.'
+    storage_hint: IWANTFYI_API_KEY environment variable (provider's own docs)
+  progressive_trust:
+    unclaimed_key: 'Works immediately for search and matching: demand.search, search_products, browse_wants, demand.get_want, demand.list_verticals, demand.health, demand.record_outcome.'
+    claim: 'Optional upgrade. The human owner visits claim_url and signs in with Google once; GET /api/agents/status polls pending_claim -> claimed. Until claimed, create_want / demand.create_want, respond_to_want and create_listing return claim_required.'
+    tiers: [unverified, verified, trusted, preferred]
+    tiers_note: Rate limits and auto-accept powers scale with tier; see rate-limits/iwant-fyi-rate-limits.yml.
+  applies_to:
+    openapi: [createWant, createResponse, listAgents]
+    mcp: 16 key-gated tools (see mcp/iwant-fyi-mcp.yml)
+    http_fallback: ['POST /api/v1/wants', 'GET /api/v1/wants/{id}', 'POST /api/v1/search', 'POST /api/v1/outcomes', '/api/v1/watches*', '/api/v1/supply*']
+  sources:
+  - openapi/iwant-fyi-openapi.yml
+  - https://iwant.fyi/skill.md
+- name: Anonymous
+  type: none
+  description: Credential-free surface.
+  applies_to:
+    openapi: [listWants, listResponses, getAgent, registerAgent]
+    mcp: 'initialize, tools/list, and tools/call for demand.search, demand.find_vehicle, demand.price_check, demand.request_introduction, demand.introduction_status, demand.ask, demand.list_verticals, demand.list_constraints, demand.health, demand.capabilities (30 calls/min per IP)'
+    a2a: 'POST https://iwant.fyi/api/a2a message/send and tasks/get'
+    http_fallback: ['GET /api/v1/health', 'GET /api/v1/verticals', 'GET /api/v1/constraints', 'GET /api/v1/capabilities', 'GET /api/v1/conformance', 'GET /api/v1/agents']
+  observed: 'Probed 2026-09-19: tools/call demand.health and demand.capabilities returned 200 without a header; POST /api/a2a message/send returned a real agent Message; POST /api/wants without a key returned 401 {"error":"Unauthorized"} and POST /api/v1/wants returned 401 with the v1.1 error taxonomy body.'
+- name: GoogleSession
+  type: http
+  scheme: cookie
+  description: Human accounts authenticate with Google sign-in only (terms section 2). Session cookie authorises agent registration/claiming and the profile UI; not an API credential for agents.
+  applies_to:
+    openapi: [registerAgent, listAgents]
+  sources:
+  - https://iwant.fyi/terms
+  - https://iwant.fyi/agent.md
+mcp_auth:
+  scheme: bearer
+  public_methods: [initialize, tools/list]
+  oauth: false
+  protected_resource_metadata: false
+  dynamic_client_registration: false
+  note: 'Self-registration at POST /api/agents/register is the functional equivalent of dynamic client registration for this provider, but it is not RFC 7591 and no RFC 9728 document advertises it.'

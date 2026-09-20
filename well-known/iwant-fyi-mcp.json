@@ -1,0 +1,75 @@
+{
+  "name": "iwant.fyi",
+  "title": "iwant.fyi -- demand-side commerce",
+  "description": "Demand-side commerce MCP server: AI agents express structured purchase intent on behalf of a user and receive matched supply -- real products with live prices, ranked across multiple sources. Reference implementation of the iwant.fyi demand-side protocol v1.1. MCP-native with an HTTP fallback.",
+  "version": "1.1",
+  "homepage": "https://iwant.fyi",
+  "documentation": "https://iwant.fyi/developers",
+  "license": "Apache-2.0",
+  "provider": {
+    "organization": "iwant.fyi",
+    "url": "https://iwant.fyi",
+    "contactEmail": "hi@iwant.fyi"
+  },
+  "server": {
+    "url": "https://iwant.fyi/api/mcp",
+    "transport": "streamable-http"
+  },
+  "remotes": [
+    { "transport_type": "streamable-http", "url": "https://iwant.fyi/api/mcp" }
+  ],
+  "authentication": {
+    "type": "bearer",
+    "required_for": ["tools/call"],
+    "public_methods": ["initialize", "tools/list"],
+    "token_format": "iwant_ak_...",
+    "obtain": "POST https://iwant.fyi/api/agents/register",
+    "note": "initialize and tools/list are public (no key) so clients and reviewers can inspect the server. A free key unlocks tools/call."
+  },
+  "capabilities": { "tools": true, "resources": false, "prompts": false },
+  "featured_tools": [
+    {
+      "name": "demand.search",
+      "title": "Find products (ephemeral search)",
+      "description": "Find products to buy across multiple supply sources for a natural-language query. Returns ranked matches with live prices; persists nothing."
+    },
+    {
+      "name": "demand.create_want",
+      "title": "Buy: create a Want and get matches",
+      "description": "Record a buyer's structured purchase intent (a Want) and return matched supply. The buyer-side primitive."
+    },
+    {
+      "name": "demand.create_watch",
+      "title": "Create a standing want (watch)",
+      "description": "Register persistent buy-intent that re-matches on a schedule and notifies via webhook when NEW matching supply appears."
+    }
+  ],
+  "tools_list_endpoint": {
+    "url": "https://iwant.fyi/api/mcp",
+    "method": "tools/list",
+    "note": "Public (no key). Call for the full, current set of 19 tools."
+  },
+  "protocol": {
+    "name": "iwant.fyi demand-side protocol",
+    "version": "1.1",
+    "spec": "https://iwant.fyi/protocol/v1",
+    "http_fallback": "https://iwant.fyi/api/v1"
+  },
+  "links": {
+    "llms_txt": "https://iwant.fyi/llms.txt",
+    "agent_card": "https://iwant.fyi/.well-known/agent-card.json",
+    "spec": "https://iwant.fyi/protocol/v1",
+    "github_spec": "https://github.com/staugs/iwantfyi-spec",
+    "developers": "https://iwant.fyi/developers",
+    "privacy": "https://iwant.fyi/privacy",
+    "terms": "https://iwant.fyi/terms"
+  },
+  "sdks": {
+    "typescript": "https://www.npmjs.com/package/@iwantfyi/sdk",
+    "vercel_ai_sdk": "https://www.npmjs.com/package/@iwantfyi/ai-sdk",
+    "langchain": "https://pypi.org/project/iwantfyi-langchain/",
+    "llamaindex": "https://pypi.org/project/iwantfyi-llamaindex/",
+    "composio": "https://pypi.org/project/iwantfyi-composio/",
+    "crewai": "https://pypi.org/project/iwantfyi-crewai/"
+  }
+}

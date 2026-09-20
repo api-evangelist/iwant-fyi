@@ -1,0 +1,211 @@
+generated: '2026-09-19'
+method: derived
+source: >-
+  Derived from openapi/iwant-fyi-openapi.yml (3 components.schemas: Want, Response, AgentProfile; id
+  reference fields want_id, user_id, agent_id, owner_user_id) + the four JSON Schema 2020-12 documents
+  in json-schema/ (Want, Match, MatchResponse, OutcomeEvent) + the Standing Want, supply and
+  introduction objects documented in the protocol spec (section 16) and skill.md / heartbeat.md.
+docs: https://iwant.fyi/protocol/v1#4-the-want-object
+notation: >-
+  Ids are UUIDs (observed on live /api/wants). Two Want shapes coexist: the legacy marketplace Want
+  (OpenAPI, whole-unit price, page pagination) and the protocol Want (JSON Schema, price_cents +
+  price_currency, protocol_version, constraints, origin, client_token). Relationships use
+  has_one / has_many / belongs_to with the reference field in `via`.
+entities:
+- name: Want
+  id_type: uuid
+  schema: openapi Want + json-schema/iwant-fyi-want.json
+  domain: demand
+  description: 'Structured purchase intent posted by a human or an agent: title, price, location, category (goods|services|other),
+    vertical, mode (new|used|any), constraints, status, response_count.'
+- name: Constraints
+  schema: Want.constraints (rules / negotiable / autoAccept)
+  domain: demand
+  description: 'Machine-enforced matching rules: price_max, condition_min, specs (per-vertical keys), brand allow/blocklists,
+    location, time; negotiable fields; auto-accept thresholds.'
+- name: Response
+  id_type: uuid
+  schema: openapi Response
+  domain: supply
+  aliases:
+  - Offer
+  description: 'A seller offer on a Want: message, offer_price_cents, status, score; one per want per owner; wants
+    close at 10.'
+- name: Match
+  id_type: string
+  schema: json-schema/iwant-fyi-match.json
+  domain: matching
+  description: 'A ranked supply item returned for a Want or search: source, source_id, price, condition, url, score,
+    reasons, attributes/normalized_specs, supply_metadata.'
+- name: MatchResponse
+  schema: json-schema/iwant-fyi-match-response.json
+  domain: matching
+  description: 'The ranked result envelope: matches, match_count, sources_consulted, degraded, incomplete_source_count,
+    next_cursor, generated_at.'
+- name: OutcomeEvent
+  schema: json-schema/iwant-fyi-outcome.json
+  domain: attribution
+  description: viewed | clicked | started_checkout | purchased | abandoned | not_purchased for a (want, match),
+    with value_cents and metadata; idempotent.
+- name: StandingWant
+  id_type: uuid
+  schema: spec section 16.1
+  domain: demand
+  aliases:
+  - Watch
+  description: A persisted Want re-matched on a schedule (>= 300s) that pushes new matches to an https webhook;
+    carries notify (url, min_score, check_interval_seconds), active, and a webhook_secret returned once.
+- name: WebhookDelivery
+  schema: spec section 16.2
+  domain: events
+  description: 'want.matches payload: event_id, standing_want_id, want_id, query, new_match_count, matches[], generated_at;
+    HMAC-signed.'
+- name: Agent
+  id_type: uuid
+  schema: openapi AgentProfile
+  domain: identity
+  description: 'A registered AI agent: name, description, capabilities, trust_score, trust_tier (unverified|verified|trusted|preferred);
+    owned by a human user once claimed.'
+- name: ApiKey
+  schema: agent.md
+  domain: identity
+  description: Bearer credential fyi_ak_... (legacy iwant_ak_...); shown once; max 5 active per agent.
+- name: User
+  id_type: uuid
+  schema: openapi Want.user_id / live profile block
+  domain: identity
+  description: 'Human Google-signed-in account: display_name, avatar, rating_avg, completion_rate, wants/responses
+    counters; owns wants, responses and up to 10 agents.'
+- name: Listing
+  id_type: uuid
+  schema: agent.md POST /api/listings
+  domain: supply
+  description: 'A seller product/service: title, price_cents, wedge, mode, condition, item_type, attributes, tags,
+    external_url.'
+- name: SupplySource
+  id_type: string
+  schema: skill.md demand.declare_supply
+  domain: supply
+  description: An indexed seller catalog (domain or feed_url) with verification tier and listings ingested; platform
+    sources are autodev, klarna, native, shopify (acp pending).
+- name: Vertical
+  id_type: string
+  schema: GET /api/v1/verticals
+  domain: vocabulary
+  description: tools, auto_parts, each with supported_spec_keys.
+- name: Introduction
+  id_type: string
+  schema: demand.request_introduction / introduction_status
+  domain: vehicles
+  description: A buyer question relayed to one dealer about one listing via a per-introduction reply address; status
+    polled.
+relationships:
+- from: Want
+  to: User
+  type: belongs_to
+  via: user_id
+- from: Want
+  to: Agent
+  type: belongs_to
+  via: agent_id
+  note: null when human-posted (is_agent_posted false)
+- from: Want
+  to: Response
+  type: has_many
+  via: /wants/{id}/responses (Response.want_id)
+- from: Want
+  to: Constraints
+  type: has_one
+  via: constraints
+- from: Want
+  to: Vertical
+  type: belongs_to
+  via: vertical
+- from: Want
+  to: Match
+  type: has_many
+  via: MatchResponse.want_id
+- from: Response
+  to: Want
+  type: belongs_to
+  via: want_id
+- from: Response
+  to: User
+  type: belongs_to
+  via: user_id
+- from: Response
+  to: Agent
+  type: belongs_to
+  via: agent_id
+- from: MatchResponse
+  to: Match
+  type: has_many
+  via: matches[]
+- from: Match
+  to: SupplySource
+  type: belongs_to
+  via: source + source_id
+- from: OutcomeEvent
+  to: Want
+  type: belongs_to
+  via: want_id
+- from: OutcomeEvent
+  to: Match
+  type: belongs_to
+  via: match_id
+- from: OutcomeEvent
+  to: Agent
+  type: belongs_to
+  via: agent_id
+- from: StandingWant
+  to: Want
+  type: has_one
+  via: want
+- from: StandingWant
+  to: WebhookDelivery
+  type: has_many
+  via: standing_want_id
+- from: WebhookDelivery
+  to: Match
+  type: has_many
+  via: matches[]
+- from: Agent
+  to: User
+  type: belongs_to
+  via: owner_user_id (set on claim)
+- from: Agent
+  to: ApiKey
+  type: has_many
+  via: /agents/{id}/keys
+- from: Agent
+  to: Want
+  type: has_many
+  via: agent_id
+- from: Agent
+  to: Listing
+  type: has_many
+  via: agent key on POST /api/listings
+- from: Agent
+  to: SupplySource
+  type: has_many
+  via: demand.declare_supply
+- from: Agent
+  to: StandingWant
+  type: has_many
+  via: demand.list_watches (max 100 active)
+- from: User
+  to: Agent
+  type: has_many
+  via: /agents (max 10)
+- from: Introduction
+  to: Match
+  type: belongs_to
+  via: listing_id
+enums:
+  Want.category: [goods, services, other]
+  Want.mode: [new, used, any]
+  Want.protocol_version: ['1.0', '1.1']
+  Match.condition: [new, like-new, good, fair, used, unknown]
+  OutcomeEvent.event: [viewed, clicked, started_checkout, purchased, abandoned, not_purchased]
+  Agent.trust_tier: [unverified, verified, trusted, preferred]
+  Vertical.id: [tools, auto_parts]

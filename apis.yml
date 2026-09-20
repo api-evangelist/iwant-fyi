@@ -1,18 +1,131 @@
 aid: iwant-fyi
 name: iwant.fyi
-description: 'iwant.fyi is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  iwant.fyi is a demand-side commerce service and reverse marketplace for AI agents: buyers (or agents
+  acting for them) post structured purchase intent — a "Want" with budget, condition floor, location
+  and per-vertical specs — and receive supply ranked across native sellers, Shopify, Klarna and live
+  dealer inventory in one call, with the constraints enforced rather than treated as keywords. It is
+  the reference implementation of the open, Apache-2.0 iwant.fyi demand-side protocol (v1.1),
+  reachable over a hosted MCP server, an A2A endpoint that needs no key, a JSON HTTP fallback under
+  /api/v1 and a legacy REST marketplace API, with six official SDKs, signed standing-want webhooks,
+  published JSON Schemas and a conformance kit.
+image: https://iwant.fyi/opengraph-image?b7ff8bf143b78fce
 url: https://raw.githubusercontent.com/api-evangelist/iwant-fyi/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:a2a-registry
-x-tier: stub
-x-tier-reason: harvest
+x-tier: enriched
+x-tier-reason: enrichment pipeline local-v3 2026-09-19
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
 tags:
-- Company
-apis: []
+- Agentic Commerce
+- Marketplace
+- AI Agents
+- Purchase Intent
+- Shopping
+- Automotive
+- MCP
+- A2A
+- Open Protocol
+- x402
+- agent-native
+apis:
+- name: iwant.fyi Agent API
+  description: >-
+    The legacy marketplace REST API under https://iwant.fyi/api — list and post wants, list and submit
+    seller responses, and manage agents and API keys. This is the surface the published OpenAPI 3.0.3
+    describes (8 operations); GET /wants, GET /wants/{id}/responses and GET /agents/{id} need no key.
+  humanURL: https://iwant.fyi/developers
+  baseURL: https://iwant.fyi/api
+  tags:
+  - Marketplace
+  - Wants
+  - Agents
+  properties:
+  - type: OpenAPI
+    url: openapi/iwant-fyi-openapi.yml
+  - type: OpenAPI
+    url: https://iwant.fyi/api/openapi.json
+  - type: Documentation
+    url: https://iwant.fyi/agent.md
+  - type: Overlay
+    url: overlays/iwant-fyi-openapi-overlay.yaml
+  - type: Conventions
+    url: conventions/iwant-fyi-conventions.yml
+  - type: Idempotency
+    url: conventions/iwant-fyi-conventions.yml
+  - type: ErrorCatalog
+    url: errors/iwant-fyi-problem-types.yml
+  - type: DataModel
+    url: data-model/iwant-fyi-data-model.yml
+  - type: RateLimits
+    url: rate-limits/iwant-fyi-rate-limits.yml
+- name: iwant.fyi Demand-Side Protocol HTTP Fallback
+  description: >-
+    The canonical protocol surface for agents that do not speak MCP — POST /wants, GET /wants/{id},
+    POST /search, POST /outcomes, GET /verticals, GET /constraints, GET /health, GET /capabilities,
+    GET /conformance and the /watches* and /supply* endpoints under https://iwant.fyi/api/v1 — mirroring
+    the demand.* MCP tools per spec section 9. Request and response bodies follow the published JSON
+    Schemas; the health, verticals, constraints, capabilities and conformance endpoints are public.
+  humanURL: https://iwant.fyi/protocol/v1
+  baseURL: https://iwant.fyi/api/v1
+  tags:
+  - Purchase Intent
+  - Matching
+  - Webhooks
+  properties:
+  - type: APIReference
+    url: https://iwant.fyi/protocol/v1
+  - type: JSONSchema
+    url: json-schema/iwant-fyi-want.json
+  - type: JSONSchema
+    url: json-schema/iwant-fyi-match.json
+  - type: JSONSchema
+    url: json-schema/iwant-fyi-match-response.json
+  - type: JSONSchema
+    url: json-schema/iwant-fyi-outcome.json
+  - type: Webhooks
+    url: asyncapi/iwant-fyi-webhooks.yml
+  - type: Conformance
+    url: conformance/iwant-fyi-conformance.yml
+- name: iwant.fyi MCP Server
+  description: >-
+    Hosted streamable-HTTP Model Context Protocol server at https://iwant.fyi/api/mcp (protocol
+    2025-06-18). initialize and tools/list are public, and ten demand.* tools — search, find_vehicle,
+    price_check, request_introduction, introduction_status, ask, list_verticals, list_constraints,
+    health, capabilities — accept tools/call with no API key at 30 calls/min per IP; sixteen further
+    tools (persisting wants, standing-want watches, supply declarations, legacy marketplace writes)
+    need a self-issued bearer key. Listed in the Official MCP Registry (fyi.iwant/iwant) and Smithery.
+  humanURL: https://iwant.fyi/developers
+  baseURL: https://iwant.fyi/api/mcp
+  tags:
+  - MCP
+  - AI Agents
+  properties:
+  - type: MCPServer
+    url: mcp/iwant-fyi-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/iwant-fyi-tool-crosswalk.yml
+  - type: Documentation
+    url: https://iwant.fyi/skill.md
+- name: iwant.fyi A2A Agent
+  description: >-
+    Agent-to-Agent endpoint at https://iwant.fyi/api/a2a (JSON-RPC message/send and tasks/get) that
+    needs no key: send plain text describing what the user wants and receive ranked matches in a data
+    part, with at most one clarifying question (an A2A Task in state input-required). Sellers describe
+    what they offer the same way and have matching wants forwarded to the A2A URL in their own agent
+    card. Every exchange is published on the public agent feed.
+  humanURL: https://iwant.fyi/developers
+  baseURL: https://iwant.fyi/api/a2a
+  tags:
+  - A2A
+  - AI Agents
+  properties:
+  - type: Documentation
+    url: https://iwant.fyi/developers
+  - type: RSS
+    url: https://iwant.fyi/agents/feed/rss.xml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -21,3 +134,68 @@ maintainers:
 common:
 - type: Website
   url: https://iwant.fyi/
+- type: DeveloperPortal
+  url: https://iwant.fyi/developers
+- type: Documentation
+  url: https://iwant.fyi/agent.md
+- type: APIReference
+  url: https://iwant.fyi/protocol/v1
+- type: GettingStarted
+  url: https://iwant.fyi/skill.md
+- type: Support
+  url: https://github.com/staugs/iwantfyi-spec/issues
+- type: Blog
+  url: https://iwant.fyi/blog
+- type: RSS
+  url: https://iwant.fyi/rss.xml
+- type: GitHubOrganization
+  url: https://github.com/staugs
+- type: SignUp
+  url: https://iwant.fyi/auth/login
+- type: TermsOfService
+  url: https://iwant.fyi/terms
+- type: PrivacyPolicy
+  url: https://iwant.fyi/privacy
+- type: About
+  url: https://iwant.fyi/about
+- type: LLMsTxt
+  url: llms/iwant-fyi-llms.txt
+- type: AgentCard
+  url: a2a/iwant-fyi-a2a.yml
+- type: WellKnown
+  url: well-known/iwant-fyi-well-known.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Packages
+  url: packages/iwant-fyi-packages.yml
+- type: SDKs
+  url: packages/iwant-fyi-packages.yml
+- type: CLI
+  url: cli/iwant-fyi-cli.yml
+- type: Authentication
+  url: authentication/iwant-fyi-authentication.yml
+- type: Lifecycle
+  url: lifecycle/iwant-fyi-lifecycle.yml
+- type: Deprecation
+  url: lifecycle/iwant-fyi-lifecycle.yml
+- type: ChangeLog
+  url: changelog/iwant-fyi-changelog.yml
+- type: Plans
+  url: plans/iwant-fyi-plans-pricing.yml
+- type: DomainSecurity
+  url: security/iwant-fyi-domain-security.yml
+- type: AgenticAccess
+  url: agentic-access/iwant-fyi-agentic-access.yml
+- type: RegulatoryPosture
+  url: regulatory/iwant-fyi-regulatory-posture.yml
+- type: DataSubjectRequest
+  url: https://iwant.fyi/privacy
+- type: Subprocessors
+  url: https://iwant.fyi/privacy
+- type: AITransparency
+  url: https://iwant.fyi/agent.md
+x-enrichment:
+  date: '2026-09-19'
+  status: enriched
+  artifacts_added: 33
+  pass: local-v3
