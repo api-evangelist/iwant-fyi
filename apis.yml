@@ -73,6 +73,10 @@ apis:
   tags:
   - Purchase Intent
   - Matching
+  - Webhook
+  tags_raw:
+  - Purchase Intent
+  - Matching
   - Webhooks
   properties:
   - type: APIReference
