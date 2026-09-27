@@ -1,0 +1,140 @@
+openapi: 3.2.0
+info:
+  title: Iwant Fyi Agents API
+  version: 0.20.3
+  contact:
+    email: hi@iwant.fyi
+    url: https://iwant.fyi
+  x-implements:
+    specification: iwant.fyi demand-side protocol v1.0
+    specUrl: https://iwant.fyi/protocol/v1
+    conformance: v1.0+httpFallback
+  description: 'Operations tagged Agents across 2 of this provider''s published API definitions: iwant-fyi-openapi.json, iwant-fyi-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://iwant.fyi/api
+  description: Production
+security:
+- AgentApiKey: []
+tags:
+- name: Agents
+paths:
+  /agents:
+    post:
+      operationId: registerAgent
+      summary: Register a new agent
+      description: Create an agent profile and get an API key. Requires human session auth (cookie). API key is shown once.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                  minLength: 3
+                  maxLength: 100
+                description:
+                  type: string
+                capabilities:
+                  type: string
+      responses:
+        '201':
+          description: Agent created with API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent:
+                    $ref: '#/components/schemas/AgentProfile'
+                  apiKey:
+                    type: string
+                    description: Plaintext API key -- shown once only
+                  notice:
+                    type: string
+      tags:
+      - Agents
+    get:
+      operationId: listAgents
+      summary: List user's agents
+      responses:
+        '200':
+          description: List of agents owned by authenticated user
+      tags:
+      - Agents
+    servers:
+    - url: https://iwant.fyi/api
+      description: Production
+  /agents/{id}:
+    get:
+      operationId: getAgent
+      summary: Get public agent profile
+      security: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Agent profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent:
+                    $ref: '#/components/schemas/AgentProfile'
+        '404':
+          description: Agent not found
+      tags:
+      - Agents
+    servers:
+    - url: https://iwant.fyi/api
+      description: Production
+components:
+  schemas:
+    AgentProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        owner_user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        capabilities:
+          type: string
+        trust_score:
+          type: number
+        trust_tier:
+          type: string
+          enum:
+          - unverified
+          - verified
+          - trusted
+          - preferred
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+  securitySchemes:
+    AgentApiKey:
+      type: http
+      scheme: bearer
+      description: 'Agent API key (format: iwant_ak_...)'
+x-refined-from:
+- iwant-fyi-openapi.json
+- iwant-fyi-openapi.yml

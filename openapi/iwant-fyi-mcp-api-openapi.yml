@@ -1,0 +1,68 @@
+openapi: 3.2.0
+info:
+  title: Iwant Fyi MCP API
+  version: 0.20.3
+  contact:
+    email: hi@iwant.fyi
+    url: https://iwant.fyi
+  x-implements:
+    specification: iwant.fyi demand-side protocol v1.0
+    specUrl: https://iwant.fyi/protocol/v1
+    conformance: v1.0+httpFallback
+  description: 'Operations tagged Mcp across 2 of this provider''s published API definitions: iwant-fyi-openapi.json, iwant-fyi-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://iwant.fyi/api
+  description: Production
+security:
+- AgentApiKey: []
+tags:
+- name: MCP
+paths:
+  /mcp:
+    post:
+      operationId: mcpEndpoint
+      summary: MCP Server (JSON-RPC 2.0)
+      description: 'Model Context Protocol endpoint. Methods: initialize, tools/list, tools/call. Auth via API key.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - jsonrpc
+              - method
+              properties:
+                jsonrpc:
+                  type: string
+                  enum:
+                  - '2.0'
+                method:
+                  type: string
+                  enum:
+                  - initialize
+                  - tools/list
+                  - tools/call
+                params:
+                  type: object
+                id:
+                  oneOf:
+                  - type: string
+                  - type: integer
+      responses:
+        '200':
+          description: JSON-RPC response
+      tags:
+      - MCP
+    servers:
+    - url: https://iwant.fyi/api
+      description: Production
+components:
+  securitySchemes:
+    AgentApiKey:
+      type: http
+      scheme: bearer
+      description: 'Agent API key (format: iwant_ak_...)'
+x-refined-from:
+- iwant-fyi-openapi.json
+- iwant-fyi-openapi.yml

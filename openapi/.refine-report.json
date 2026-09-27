@@ -1,0 +1,49 @@
+{
+  "provider": "iwant-fyi",
+  "sources": [
+    "_original/iwant-fyi-openapi.json",
+    "iwant-fyi-openapi.yml"
+  ],
+  "outputs": [
+    "iwant-fyi-agents-api-openapi.yml",
+    "iwant-fyi-mcp-api-openapi.yml",
+    "iwant-fyi-wants-api-openapi.yml"
+  ],
+  "archived": [
+    "archived openapi/iwant-fyi-openapi.yml"
+  ],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "iwant-fyi-openapi.json: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "iwant-fyi-openapi.json: tagged paths GET /wants -> Wants",
+    "iwant-fyi-openapi.json: tagged paths POST /wants -> Wants",
+    "iwant-fyi-openapi.json: tagged paths GET /wants/{id}/responses -> Wants",
+    "iwant-fyi-openapi.json: tagged paths POST /wants/{id}/responses -> Wants",
+    "iwant-fyi-openapi.json: tagged paths POST /agents -> Agents",
+    "iwant-fyi-openapi.json: tagged paths GET /agents -> Agents",
+    "iwant-fyi-openapi.json: tagged paths GET /agents/{id} -> Agents",
+    "iwant-fyi-openapi.json: tagged paths POST /mcp -> Mcp",
+    "iwant-fyi-openapi.json: declared missing tag: Agents",
+    "iwant-fyi-openapi.json: declared missing tag: Mcp",
+    "iwant-fyi-openapi.json: declared missing tag: Wants",
+    "iwant-fyi-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "iwant-fyi-openapi.yml: tagged paths GET /wants -> Wants",
+    "iwant-fyi-openapi.yml: tagged paths POST /wants -> Wants",
+    "iwant-fyi-openapi.yml: tagged paths GET /wants/{id}/responses -> Wants",
+    "iwant-fyi-openapi.yml: tagged paths POST /wants/{id}/responses -> Wants",
+    "iwant-fyi-openapi.yml: tagged paths POST /agents -> Agents",
+    "iwant-fyi-openapi.yml: tagged paths GET /agents -> Agents",
+    "iwant-fyi-openapi.yml: tagged paths GET /agents/{id} -> Agents",
+    "iwant-fyi-openapi.yml: tagged paths POST /mcp -> Mcp",
+    "iwant-fyi-openapi.yml: declared missing tag: Agents",
+    "iwant-fyi-openapi.yml: declared missing tag: Mcp",
+    "iwant-fyi-openapi.yml: declared missing tag: Wants",
+    "tag 'Agents' spans 2 source specs (iwant-fyi-openapi.json, iwant-fyi-openapi.yml): per-path servers applied",
+    "tag 'Mcp' spans 2 source specs (iwant-fyi-openapi.json, iwant-fyi-openapi.yml): per-path servers applied",
+    "tag 'Wants' spans 2 source specs (iwant-fyi-openapi.json, iwant-fyi-openapi.yml): per-path servers applied",
+    "apis.yml register: written (+3 apis, 6 total)"
+  ],
+  "skipped": []
+}

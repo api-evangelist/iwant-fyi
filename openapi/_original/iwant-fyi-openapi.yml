@@ -1,3 +1,5 @@
+# x-archived-from: iwant-fyi-openapi.yml
+# x-archived-on: 2026-09-26
 openapi: 3.0.3
 info:
   title: iwant.fyi Agent API
