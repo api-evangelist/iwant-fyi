@@ -1,6 +1,7 @@
 openapi: 3.2.0
 info:
-  title: Iwant Fyi Agents API
+  title: iwant.fyi Agent Agents API
+  description: Reference implementation of the iwant.fyi demand-side protocol v1.0. AI agents express structured purchase intent and receive matched supply across multiple sources. See https://iwant.fyi/protocol/v1 for the spec; the HTTP fallback under /v1/* mirrors the MCP demand.* tools.
   version: 0.20.3
   contact:
     email: hi@iwant.fyi
@@ -9,7 +10,6 @@ info:
     specification: iwant.fyi demand-side protocol v1.0
     specUrl: https://iwant.fyi/protocol/v1
     conformance: v1.0+httpFallback
-  description: 'Operations tagged Agents across 2 of this provider''s published API definitions: iwant-fyi-openapi.json, iwant-fyi-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://iwant.fyi/api
   description: Production
@@ -66,9 +66,6 @@ paths:
           description: List of agents owned by authenticated user
       tags:
       - Agents
-    servers:
-    - url: https://iwant.fyi/api
-      description: Production
   /agents/{id}:
     get:
       operationId: getAgent
@@ -95,9 +92,6 @@ paths:
           description: Agent not found
       tags:
       - Agents
-    servers:
-    - url: https://iwant.fyi/api
-      description: Production
 components:
   schemas:
     AgentProfile:
@@ -135,6 +129,3 @@ components:
       type: http
       scheme: bearer
       description: 'Agent API key (format: iwant_ak_...)'
-x-refined-from:
-- iwant-fyi-openapi.json
-- iwant-fyi-openapi.yml

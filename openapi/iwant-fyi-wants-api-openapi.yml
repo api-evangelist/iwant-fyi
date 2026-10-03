@@ -1,6 +1,7 @@
 openapi: 3.2.0
 info:
-  title: Iwant Fyi Wants API
+  title: iwant.fyi Agent Wants API
+  description: Reference implementation of the iwant.fyi demand-side protocol v1.0. AI agents express structured purchase intent and receive matched supply across multiple sources. See https://iwant.fyi/protocol/v1 for the spec; the HTTP fallback under /v1/* mirrors the MCP demand.* tools.
   version: 0.20.3
   contact:
     email: hi@iwant.fyi
@@ -9,7 +10,6 @@ info:
     specification: iwant.fyi demand-side protocol v1.0
     specUrl: https://iwant.fyi/protocol/v1
     conformance: v1.0+httpFallback
-  description: 'Operations tagged Wants across 2 of this provider''s published API definitions: iwant-fyi-openapi.json, iwant-fyi-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://iwant.fyi/api
   description: Production
@@ -157,9 +157,6 @@ paths:
           description: Rate limited
       tags:
       - Wants
-    servers:
-    - url: https://iwant.fyi/api
-      description: Production
   /wants/{id}/responses:
     get:
       operationId: listResponses
@@ -223,43 +220,8 @@ paths:
           description: Rate limited
       tags:
       - Wants
-    servers:
-    - url: https://iwant.fyi/api
-      description: Production
 components:
   schemas:
-    Response:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        want_id:
-          type: string
-          format: uuid
-        user_id:
-          type: string
-          format: uuid
-        message:
-          type: string
-        offer_price_cents:
-          type: integer
-        status:
-          type: string
-          enum:
-          - pending
-          - accepted
-          - declined
-        score:
-          type: number
-        agent_id:
-          type:
-          - string
-          - 'null'
-          format: uuid
-        created_at:
-          type: string
-          format: date-time
     Want:
       type: object
       properties:
@@ -315,11 +277,40 @@ components:
         updated_at:
           type: string
           format: date-time
+    Response:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        want_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        message:
+          type: string
+        offer_price_cents:
+          type: integer
+        status:
+          type: string
+          enum:
+          - pending
+          - accepted
+          - declined
+        score:
+          type: number
+        agent_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
   securitySchemes:
     AgentApiKey:
       type: http
       scheme: bearer
       description: 'Agent API key (format: iwant_ak_...)'
-x-refined-from:
-- iwant-fyi-openapi.json
-- iwant-fyi-openapi.yml

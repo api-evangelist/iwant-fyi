@@ -1,20 +1,18 @@
 {
   "provider": "iwant-fyi",
   "sources": [
-    "_original/iwant-fyi-openapi.json",
-    "iwant-fyi-openapi.yml"
+    "_original/iwant-fyi-openapi.json"
   ],
   "outputs": [
     "iwant-fyi-agents-api-openapi.yml",
     "iwant-fyi-mcp-api-openapi.yml",
     "iwant-fyi-wants-api-openapi.yml"
   ],
-  "archived": [
-    "archived openapi/iwant-fyi-openapi.yml"
-  ],
+  "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
+    "1 archived document(s) dropped as subsets of other archived documents",
     "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "iwant-fyi-openapi.json: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
     "iwant-fyi-openapi.json: tagged paths GET /wants -> Wants",
@@ -28,22 +26,12 @@
     "iwant-fyi-openapi.json: declared missing tag: Agents",
     "iwant-fyi-openapi.json: declared missing tag: Mcp",
     "iwant-fyi-openapi.json: declared missing tag: Wants",
-    "iwant-fyi-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
-    "iwant-fyi-openapi.yml: tagged paths GET /wants -> Wants",
-    "iwant-fyi-openapi.yml: tagged paths POST /wants -> Wants",
-    "iwant-fyi-openapi.yml: tagged paths GET /wants/{id}/responses -> Wants",
-    "iwant-fyi-openapi.yml: tagged paths POST /wants/{id}/responses -> Wants",
-    "iwant-fyi-openapi.yml: tagged paths POST /agents -> Agents",
-    "iwant-fyi-openapi.yml: tagged paths GET /agents -> Agents",
-    "iwant-fyi-openapi.yml: tagged paths GET /agents/{id} -> Agents",
-    "iwant-fyi-openapi.yml: tagged paths POST /mcp -> Mcp",
-    "iwant-fyi-openapi.yml: declared missing tag: Agents",
-    "iwant-fyi-openapi.yml: declared missing tag: Mcp",
-    "iwant-fyi-openapi.yml: declared missing tag: Wants",
-    "tag 'Agents' spans 2 source specs (iwant-fyi-openapi.json, iwant-fyi-openapi.yml): per-path servers applied",
-    "tag 'Mcp' spans 2 source specs (iwant-fyi-openapi.json, iwant-fyi-openapi.yml): per-path servers applied",
-    "tag 'Wants' spans 2 source specs (iwant-fyi-openapi.json, iwant-fyi-openapi.yml): per-path servers applied",
-    "apis.yml register: written (+3 apis, 6 total)"
+    "apis.yml register: already-registered"
   ],
-  "skipped": []
+  "skipped": [
+    "_original/iwant-fyi-openapi.yml: archived document superseded by a larger archived document",
+    "iwant-fyi-agents-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "iwant-fyi-mcp-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "iwant-fyi-wants-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }
