@@ -140,6 +140,8 @@ apis:
   humanURL: https://iwant.fyi/developers
   baseURL: https://iwant.fyi/api
   tags:
+  - MCP
+  tags_raw:
   - Mcp
   properties:
   - type: OpenAPI
