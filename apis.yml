@@ -186,6 +186,8 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Pricing
+  url: https://iwant.fyi/terms
 - type: Overlay
   url: overlays/iwant-fyi-openapi-overlay.yaml
 - type: Website
