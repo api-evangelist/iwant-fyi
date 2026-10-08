@@ -186,6 +186,8 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: RateLimits
+  url: rate-limits/iwant-fyi-rate-limits.yml
 - type: Pricing
   url: https://iwant.fyi/terms
 - type: Overlay
