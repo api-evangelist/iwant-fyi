@@ -1,0 +1,31 @@
+# Front Door AI Index — iwant-fyi — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: iwant-fyi
+  lexicon_version: '1.0'
+  probed_at: '2026-09-25'
+  host: iwant.fyi
+  final_host: iwant.fyi
+  ownership: own
+  owner: iwant-fyi
+  shares_host_with: null
+  inherited_from: null
+  alias_of: null
+  verdict: scored
+  score: 8
+  band: 4
+  band_label: moderate
+  host_score: 8
+  density: 32.13
+  words: 249
+  tiers:
+    agentic: 4
+    core: 4
+    model: 0
+  ambiguous: 8
+  top_terms:
+    agent: 8
+    AI: 4
+    AI agent: 2
+    MCP: 2
