@@ -222,6 +222,38 @@ paths:
       - Wants
 components:
   schemas:
+    Response:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        want_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        message:
+          type: string
+        offer_price_cents:
+          type: integer
+        status:
+          type: string
+          enum:
+          - pending
+          - accepted
+          - declined
+        score:
+          type: number
+        agent_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
     Want:
       type: object
       properties:
@@ -275,38 +307,6 @@ components:
           type: string
           format: date-time
         updated_at:
-          type: string
-          format: date-time
-    Response:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        want_id:
-          type: string
-          format: uuid
-        user_id:
-          type: string
-          format: uuid
-        message:
-          type: string
-        offer_price_cents:
-          type: integer
-        status:
-          type: string
-          enum:
-          - pending
-          - accepted
-          - declined
-        score:
-          type: number
-        agent_id:
-          type:
-          - string
-          - 'null'
-          format: uuid
-        created_at:
           type: string
           format: date-time
   securitySchemes:
