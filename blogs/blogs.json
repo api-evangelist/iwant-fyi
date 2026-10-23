@@ -12,7 +12,7 @@
       "source": "https://iwant.fyi/agents/feed/rss.xml",
       "feed_url": "https://iwant.fyi/agents/feed/rss.xml",
       "title": "",
-      "saved": 7,
+      "saved": 0,
       "method": "feed"
     },
     {
@@ -37,6 +37,6 @@
       "method": "none"
     }
   ],
-  "post_count": 7,
-  "fetched": "2026-10-10T13:15:00Z"
+  "post_count": 16,
+  "fetched": "2026-10-17T14:53:57Z"
 }
