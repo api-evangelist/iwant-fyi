@@ -129,3 +129,9 @@ components:
       type: http
       scheme: bearer
       description: 'Agent API key (format: iwant_ak_...)'
+x-provenance:
+  method: harvested
+  publisher: iwant.fyi
+  source: https://iwant.fyi/api/openapi.json
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
