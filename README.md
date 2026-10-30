@@ -64,5 +64,146 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-iwant.fyi is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry) and added to the network as a stub for full-pipeline profiling.
-- https://iwant.fyi/
+iwant.fyi is a demand-side commerce service and reverse marketplace for AI agents: buyers (or agents acting for them) post structured purchase intent — a "Want" with budget, condition floor, location and per-vertical specs — and receive supply ranked across native sellers, Shopify, Klarna and live dealer inventory in one call, with the constraints enforced rather than treated as keywords. It is the reference implementation of the open, Apache-2.0 iwant.fyi demand-side protocol (v1.1), reachable over a hosted MCP server, an A2A endpoint that needs no key, a JSON HTTP fallback under /api/v1 and a legacy REST marketplace API, with six official SDKs, signed standing-want webhooks, published JSON Schemas and a conformance kit.
+
+**Areas:** Agentic Commerce · Marketplace · AI Agents · Purchase Intent · Shopping · Automotive · MCP · A2A · Open Protocol · x402 · Agent-Native
+
+## iwant.fyi on APIs.io
+
+Everything profiled for iwant.fyi is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/iwant-fyi/](https://apis.io/providers/iwant-fyi/)** — or go straight to one of the APIs or properties below.
+
+### APIs (6)
+
+- [iwant.fyi Demand-Side Protocol HTTP Fallback](https://apis.io/apis/iwant-fyi/iwantfyi-demand-side-protocol-http-fallback/) — The canonical protocol surface for agents that do not speak MCP — POST /wants, GET /wants/{id}, POST /search, POST /outcomes, GET /verticals, GET…
+- [iwant.fyi MCP Server](https://apis.io/apis/iwant-fyi/iwantfyi-mcp-server/) — Hosted streamable-HTTP Model Context Protocol server at https://iwant.fyi/api/mcp (protocol 2025-06-18). initialize and tools/list are public, and ten…
+- [iwant.fyi A2A Agent](https://apis.io/apis/iwant-fyi/iwantfyi-a2a-agent/) — Agent-to-Agent endpoint at https://iwant.fyi/api/a2a (JSON-RPC message/send and tasks/get) that needs no key: send plain text describing what the user wants…
+- [iwant.fyi Agents API](https://apis.io/apis/iwant-fyi/iwant-fyi-agents-api/) — The Agents API from iwant.fyi — 2 operation(s) for agents.
+- [iwant.fyi MCP API](https://apis.io/apis/iwant-fyi/iwant-fyi-mcp-api/) — The Mcp API from iwant.fyi — 1 operation(s) for mcp.
+- [iwant.fyi Wants API](https://apis.io/apis/iwant-fyi/iwant-fyi-wants-api/) — The Wants API from iwant.fyi — 2 operation(s) for wants.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (1)
+
+Event-driven and webhook contracts.
+
+- [Iwant Fyi Webhooks](https://apis.io/asyncapis/iwant-fyi/iwant-fyi-webhooks/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [fyi](https://apis.io/servers/iwant-fyi/fyi/)
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Iwant Fyi Agentic Access](https://apis.io/agentic-access/iwant-fyi/iwant-fyi-agentic-access/)
+
+#### JSON Schema (4)
+
+The data models the API reads and writes.
+
+- [Match](https://apis.io/schemas/iwant-fyi/iwant-fyi-match/)
+- [MatchResponse](https://apis.io/schemas/iwant-fyi/iwant-fyi-match-response/)
+- [OutcomeEvent](https://apis.io/schemas/iwant-fyi/iwant-fyi-outcome/)
+- [Want](https://apis.io/schemas/iwant-fyi/iwant-fyi-want/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Iwant Fyi Openapi Overlay](https://apis.io/overlays/iwant-fyi/iwant-fyi-openapi-overlay/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Iwant Fyi Authentication](https://apis.io/security/iwant-fyi/iwant-fyi-authentication/)
+- [Iwant Fyi Domain Security](https://apis.io/security/iwant-fyi/iwant-fyi-domain-security/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Iwant Fyi Plans Pricing](https://apis.io/plans/iwant-fyi/iwant-fyi-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Iwant Fyi Rate Limits](https://apis.io/rate-limits/iwant-fyi/iwant-fyi-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://iwant.fyi/)
+- [Documentation](https://iwant.fyi/agent.md)
+- [Getting started](https://iwant.fyi/skill.md)
+- [API reference](https://iwant.fyi/protocol/v1)
+- [Pricing](https://iwant.fyi/terms)
+- [Sign up](https://iwant.fyi/auth/login)
+- [Support](https://github.com/staugs/iwantfyi-spec/issues)
+- [Blog](https://iwant.fyi/blog)
+- [Terms of service](https://iwant.fyi/terms)
+- [Privacy policy](https://iwant.fyi/privacy)
+- [GitHub](https://github.com/staugs)
+
+## API Evangelist rating
+
+**Kin Score 60.1** — strong · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 75.0 |
+| Contract quality | 59.6 |
+| Contract governance | 18.2 |
+| Operational transparency | 36.8 |
+| Developer ergonomics | 78.6 |
+| Access clarity | 65.8 |
+
+**Agent readiness 44.2** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | documented (partial credit) |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | documented (partial credit) |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | yes |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | conformant |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 32.4** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/iwant-fyi/](https://apis.io/providers/iwant-fyi/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for iwant.fyi: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/iwant-fyi/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
